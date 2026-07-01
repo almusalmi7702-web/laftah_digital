@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Eye, EyeOff, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye, EyeOff } from 'lucide-react';
 import { getAllFaqs, deleteFaq, updateFaq, createFaq } from '../../services/dataService';
 import type { Faq } from '../../types/database';
 

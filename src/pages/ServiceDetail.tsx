@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Check, MessageCircle } from 'lucide-react';
 import { getServiceBySlug } from '../services/dataService';
-import { getWhatsAppLink, messages, servicesList as staticServices } from '../data/content';
+import { getWhatsAppLink, servicesList as staticServices } from '../data/content';
 import type { Service } from '../types/database';
 
 const ServiceDetail = () => {

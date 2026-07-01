@@ -10,22 +10,38 @@ const Portfolio = () => {
   const { ref, isInView } = useInView(0.05);
   const [items, setItems] = useState<PortfolioItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let mounted = true;
+
     const fetch = async () => {
       try {
+        setError(null);
         const data = await getPortfolioItems();
-        setItems(data);
-      } catch (err) {
-        console.error('Error:', err);
+        if (mounted) {
+          setItems(data);
+        }
+      } catch (err: any) {
+        console.error('Error fetching portfolio:', err);
+        if (mounted) {
+          setError(err.message || 'حدث خطأ في جلب الأعمال');
+          setItems([]);
+        }
       } finally {
-        setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     };
+
     fetch();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  // Use database items or show empty state
   const hasItems = items.length > 0;
 
   return (
@@ -49,6 +65,8 @@ const Portfolio = () => {
             <div className="w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin" />
           </div>
         </section>
+      ) : error ? (
+        <EmptyState error={error} />
       ) : hasItems ? (
         <PortfolioGrid items={items} isInView={isInView} />
       ) : (
@@ -105,7 +123,11 @@ const PortfolioGrid = ({ items, isInView }: PortfolioGridProps) => {
   );
 };
 
-const EmptyState = () => {
+interface EmptyStateProps {
+  error?: string;
+}
+
+const EmptyState = ({ error }: EmptyStateProps) => {
   return (
     <section className="py-20 bg-white">
       <div className="max-w-2xl mx-auto px-4 text-center">
@@ -115,9 +137,11 @@ const EmptyState = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
-          <h3 className="text-xl font-bold text-navy-800 mb-4">نعمل على إضافة أعمالنا</h3>
+          <h3 className="text-xl font-bold text-navy-800 mb-4">
+            {error ? 'حدث خطأ' : 'نعمل على إضافة أعمالنا'}
+          </h3>
           <p className="text-gray-600 leading-relaxed mb-8">
-            {portfolioContent.emptyState}
+            {error || portfolioContent.emptyState}
           </p>
           <a
             href={getWhatsAppLink(messages.general)}

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Save, Loader2, Plus, X } from 'lucide-react';
 import { getAllServices, createService, updateService } from '../../services/dataService';
-import type { ServiceInsert, Service } from '../../types/database';
+import type { ServiceInsert } from '../../types/database';
 
 const AdminServicesForm = () => {
   const { id } = useParams();
@@ -11,7 +11,6 @@ const AdminServicesForm = () => {
 
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [existingItem, setExistingItem] = useState<Service | null>(null);
   const [form, setForm] = useState({
     title: '',
     slug: '',
@@ -34,9 +33,8 @@ const AdminServicesForm = () => {
     setLoading(true);
     try {
       const data = await getAllServices();
-      const item = data?.find((i: Service) => i.id === id);
+      const item = data?.find((i) => i.id === id);
       if (item) {
-        setExistingItem(item);
         setForm({
           title: item.title,
           slug: item.slug,

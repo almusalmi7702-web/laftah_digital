@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Eye, EyeOff, Star } from 'lucide-react';
+import { Plus, Trash2, Eye, EyeOff, Star } from 'lucide-react';
 import { getAllPricingPlans, deletePricingPlan, updatePricingPlan } from '../../services/dataService';
 import type { PricingPlan } from '../../types/database';
 

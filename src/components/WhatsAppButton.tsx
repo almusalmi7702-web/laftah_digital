@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { MessageCircle } from 'lucide-react';
 import { getWhatsAppLink, messages } from '../data/content';
 
 const WhatsAppButton = () => {

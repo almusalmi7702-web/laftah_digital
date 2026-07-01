@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import {
-  getPortfolioItemBySlug, createPortfolioItem, updatePortfolioItem
+  getPortfolioItemById, createPortfolioItem, updatePortfolioItem
 } from '../../services/dataService';
 import type { PortfolioInsert } from '../../types/database';
 
@@ -35,38 +35,41 @@ const AdminPortfolioForm = () => {
 
   const fetchItem = async () => {
     setLoading(true);
+    setError('');
     try {
-      // Fetch by ID - need to modify the service or fetch all
-      const { data } = await import('../../services/dataService').then(m => m.getAllPortfolioItems());
-      const item = data?.find((i: any) => i.id === id);
+      const item = await getPortfolioItemById(id!);
       if (item) {
         setForm({
-          title: item.title,
-          slug: item.slug,
+          title: item.title || '',
+          slug: item.slug || '',
           short_description: item.short_description || '',
           details: item.details || '',
           category: item.category || '',
           thumbnail_url: item.thumbnail_url || '',
           external_url: item.external_url || '',
           project_date: item.project_date || '',
-          is_published: item.is_published,
-          sort_order: item.sort_order,
+          is_published: item.is_published ?? true,
+          sort_order: item.sort_order || 0,
         });
+      } else {
+        setError('لم يتم العثور على العمل');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error fetching:', err);
+      setError(err.message || 'خطأ في جلب البيانات');
     } finally {
       setLoading(false);
     }
   };
 
-  const generateSlug = (title: string) => {
+  const generateSlug = (title: string): string => {
+    if (!title) return `work-${Date.now()}`;
     return title
       .toLowerCase()
       .replace(/[^\w\s-]/g, '')
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-')
-      .trim();
+      .trim() || `work-${Date.now()}`;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -75,11 +78,21 @@ const AdminPortfolioForm = () => {
     setSaving(true);
 
     try {
-      const slug = form.slug || generateSlug(form.title);
+      // Generate or use provided slug
+      const slug = form.slug.trim() || generateSlug(form.title);
+
+      // Build data with null for empty optional fields
       const data: PortfolioInsert = {
-        ...form,
+        title: form.title.trim(),
         slug,
+        short_description: form.short_description.trim() || null,
+        details: form.details.trim() || null,
+        category: form.category.trim() || null,
+        thumbnail_url: form.thumbnail_url.trim() || null,
+        external_url: form.external_url.trim() || null,
         project_date: form.project_date || null,
+        is_published: form.is_published,
+        sort_order: form.sort_order,
       };
 
       if (isEdit && id) {
@@ -88,6 +101,7 @@ const AdminPortfolioForm = () => {
         await createPortfolioItem(data);
       }
 
+      // Navigate on success
       navigate('/admin/portfolio');
     } catch (err: any) {
       console.error('Error saving:', err);
@@ -275,7 +289,7 @@ const AdminPortfolioForm = () => {
           </Link>
           <button
             type="submit"
-            disabled={saving || !form.title}
+            disabled={saving || !form.title.trim()}
             className="px-6 py-3 bg-gradient-to-l from-teal-500 to-teal-600 text-white rounded-xl font-semibold flex items-center gap-2 hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {saving ? (

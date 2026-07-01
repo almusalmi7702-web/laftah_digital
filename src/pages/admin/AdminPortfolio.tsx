@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Edit, Trash2, Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye, EyeOff } from 'lucide-react';
 import {
   getAllPortfolioItems, deletePortfolioItem, updatePortfolioItem
 } from '../../services/dataService';

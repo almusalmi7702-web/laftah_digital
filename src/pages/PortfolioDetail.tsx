@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, ExternalLink, Calendar, MessageCircle } from 'lucide-react';
 import { getPortfolioItemBySlug, getPortfolioImages } from '../services/dataService';
-import { getWhatsAppLink, messages, portfolio as portfolioContent } from '../data/content';
+import { getWhatsAppLink, messages } from '../data/content';
 import type { PortfolioItem, PortfolioImage } from '../types/database';
 
 const PortfolioDetail = () => {
