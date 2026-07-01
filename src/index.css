@@ -122,3 +122,29 @@ a:focus-visible {
 .shadow-premium {
   box-shadow: 0 4px 6px -1px rgba(0,0,0,0.08), 0 20px 25px -5px rgba(0,0,0,0.08);
 }
+
+/* Custom transition duration for mobile menu */
+.duration-350 {
+  transition-duration: 350ms;
+}
+
+/* WhatsApp floating button styles */
+.whatsapp-btn {
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  box-shadow:
+    0 4px 12px rgba(37, 211, 102, 0.4),
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.whatsapp-btn:hover {
+  background: linear-gradient(135deg, #128C7E 0%, #075E54 100%);
+  box-shadow:
+    0 6px 20px rgba(37, 211, 102, 0.5),
+    0 4px 8px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.whatsapp-btn:active {
+  transform: scale(0.95) !important;
+}

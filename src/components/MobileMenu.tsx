@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { X, Sparkles } from 'lucide-react';
 import { LOGO_PATH, nav, getWhatsAppLink, messages } from '../data/content';
@@ -19,33 +19,49 @@ const navItems = [
 ];
 
 const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
+  const [visible, setVisible] = useState(false);
+  const [animating, setAnimating] = useState(false);
+
   useEffect(() => {
     if (isOpen) {
+      setAnimating(true);
       document.body.style.overflow = 'hidden';
+      requestAnimationFrame(() => setVisible(true));
     } else {
-      document.body.style.overflow = '';
+      setVisible(false);
+      const timer = setTimeout(() => {
+        setAnimating(false);
+        document.body.style.overflow = '';
+      }, 350);
+      return () => clearTimeout(timer);
     }
     return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
 
-  if (!isOpen) return null;
+  if (!animating && !isOpen) return null;
 
   return (
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 z-40 bg-navy-900/50 backdrop-blur-sm"
+        className={`fixed inset-0 z-40 bg-navy-900/50 backdrop-blur-sm transition-opacity duration-300 ${
+          visible ? 'opacity-100' : 'opacity-0'
+        }`}
         onClick={onClose}
       />
 
       {/* Drawer from right */}
-      <div className="fixed top-0 right-0 bottom-0 z-50 w-[300px] bg-white shadow-2xl animate-slide-in-right flex flex-col">
+      <div
+        className={`fixed top-0 right-0 bottom-0 z-50 w-[300px] bg-white shadow-2xl flex flex-col transition-transform duration-350 ease-out ${
+          visible ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
           <button
             onClick={onClose}
             aria-label="إغلاق القائمة"
-            className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
           >
             <X className="w-5 h-5 text-navy-800" />
           </button>
@@ -66,7 +82,7 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
               end={to === '/'}
               onClick={onClose}
               className={({ isActive }) =>
-                `block px-4 py-3 rounded-xl font-semibold text-base transition-all duration-200 text-right ${
+                `block px-4 py-3.5 rounded-xl font-semibold text-base transition-all duration-200 text-right ${
                   isActive
                     ? 'bg-teal-50 text-teal-600'
                     : 'text-navy-800 hover:bg-gray-50 hover:text-teal-600'
@@ -88,7 +104,7 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
             className="flex items-center justify-center gap-2 w-full bg-gradient-to-l from-teal-500 to-teal-600 text-white px-6 py-3.5 rounded-full font-bold text-sm hover:shadow-lg hover:shadow-teal-500/30 transition-all duration-300"
           >
             <Sparkles className="w-4 h-4" />
-            احصل على تقييم مجاني
+            احصل على تحليل مجاني
           </a>
         </div>
       </div>

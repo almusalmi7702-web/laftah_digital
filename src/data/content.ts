@@ -7,7 +7,7 @@ export const getWhatsAppLink = (message: string): string =>
 
 export const messages = {
   general: "مرحبًا، أريد الاستفسار عن خدمات لفتة ديجيتال.",
-  freeAudit: "مرحبًا، أريد الحصول على تقييم بصري مجاني لحسابي.",
+  freeAudit: "مرحبًا، أريد الحصول على تحليل مجاني لمشروعي.",
   starter: "مرحبًا، أريد الاشتراك في باقة الانطلاقة من لفتة ديجيتال.",
   growth: "مرحبًا، أريد الاشتراك في باقة النمو من لفتة ديجيتال.",
   presence: "مرحبًا، أريد الاشتراك في باقة الحضور من لفتة ديجيتال.",
@@ -20,7 +20,7 @@ export const nav = {
   services: "خدماتنا",
   pricing: "باقاتنا",
   portfolio: "أعمالنا",
-  freeAudit: "تقييم مجاني",
+  freeAudit: "تحليل مجاني",
   contact: "تواصل معنا",
 };
 
@@ -30,7 +30,7 @@ export const hero = {
   description:
     "لفتة ديجيتال وكالة تصميم رقمية تساعد المشاريع والمتاجر والمطاعم والكافيهات على الظهور باحترافية عبر تصاميم السوشيال ميديا، العروض، المنتجات، والهويات البصرية.",
   ctaServices: "استكشف خدماتنا",
-  ctaAudit: "احصل على تقييم مجاني",
+  ctaAudit: "احصل على تحليل مجاني لمشروعك",
   ctaWhatsapp: "تواصل عبر واتساب",
 };
 
@@ -153,6 +153,7 @@ export const about = {
 export const portfolio = {
   title: "معرض أعمالنا",
   subtitle: "نماذج أعمال قيد الإضافة",
+  emptyState: "نعمل على إضافة نماذج مختارة من أعمالنا قريبًا. تواصل معنا لنصمم حضورك البصري من البداية.",
   placeholders: [
     { text: "نموذج تصميم منشور", gradient: "from-teal-400 to-teal-500" },
     { text: "نموذج عرض منتج", gradient: "from-navy-600 to-navy-700" },
@@ -170,14 +171,16 @@ export const portfolio = {
 };
 
 export const freeAudit = {
-  title: "احصل على تقييم بصري مجاني",
+  title: "احصل على تحليل مجاني لمشروعك",
   description:
     "هل يعكس حساب مشروعك جودة ما تقدمه؟ دعنا نراجع حضورك البصري ونقترح لك 3 تحسينات مجانية تساعدك على الظهور بشكل أفضل.",
   projectNameLabel: "اسم المشروع",
   projectNamePlaceholder: "أدخل اسم مشروعك",
+  projectTypeLabel: "نوع المشروع",
+  projectTypePlaceholder: "مطعم، كافيه، متجر، عيادة، شركة، مشروع آخر",
   accountUrlLabel: "رابط الحساب أو المنصة",
   accountUrlPlaceholder: "https://instagram.com/youraccount",
-  submitButton: "احصل على التقييم عبر واتساب",
+  submitButton: "احصل على التحليل عبر واتساب",
 };
 
 export const contact = {
