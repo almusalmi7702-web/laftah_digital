@@ -1,12 +1,15 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Instagram, ShoppingBag, Image, Palette,
-  FileText, Presentation, Calendar, ArrowLeft,
+  FileText, Presentation, Calendar, ArrowLeft, Sparkles,
 } from 'lucide-react';
 import { useInView } from '../hooks/useInView';
+import { getServices } from '../services/dataService';
 import { servicesList, getWhatsAppLink, messages } from '../data/content';
+import type { Service } from '../types/database';
 
-const icons = [Instagram, ShoppingBag, Image, Palette, FileText, Presentation, Calendar];
+const staticIcons = [Instagram, ShoppingBag, Image, Palette, FileText, Presentation, Calendar];
 
 const Services = () => {
   const { ref, isInView } = useInView(0.05);
@@ -61,27 +64,94 @@ const Services = () => {
 
 const ServicesList = () => {
   const { ref, isInView } = useInView();
+  const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const fetch = async () => {
+      try {
+        const data = await getServices();
+        if (mounted) {
+          setServices(data);
+        }
+      } catch (err) {
+        console.error('Error fetching services:', err);
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetch();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  // Use Supabase services if available, otherwise fallback to static
+  const displayServices = services.length > 0 ? services : null;
+
+  if (loading) {
+    return (
+      <section className="py-20 bg-white">
+        <div className="flex items-center justify-center" ref={ref}>
+          <div className="w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin" />
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" ref={ref}>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {servicesList.map((s, i) => {
-            const Icon = icons[i] ?? Palette;
-            return (
-              <div
-                key={i}
+        {displayServices ? (
+          // Supabase services
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {displayServices.map((s, i) => (
+              <Link
+                key={s.id}
+                to={`/services/${s.slug}`}
                 className={`group bg-white rounded-xl p-6 shadow-sm hover:shadow-lg border border-gray-100 hover:border-teal-200 text-right transition-all duration-300 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
                 style={{ transitionDelay: `${i * 50}ms` }}
               >
                 <div className="w-12 h-12 rounded-lg bg-teal-50 flex items-center justify-center mb-4 mr-auto group-hover:bg-teal-100 transition-colors">
-                  <Icon className="w-6 h-6 text-teal-600" />
+                  <Sparkles className="w-6 h-6 text-teal-600" />
                 </div>
                 <h3 className="text-base font-bold text-navy-800 mb-2">{s.title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{s.description}</p>
-              </div>
-            );
-          })}
-        </div>
+                <p className="text-sm text-gray-500 leading-relaxed line-clamp-3">
+                  {s.short_description || s.details || ''}
+                </p>
+                {s.price && (
+                  <p className="text-teal-600 font-bold text-sm mt-3">{s.price}</p>
+                )}
+              </Link>
+            ))}
+          </div>
+        ) : (
+          // Static fallback
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {servicesList.map((s, i) => {
+              const Icon = staticIcons[i] ?? Palette;
+              return (
+                <div
+                  key={i}
+                  className={`group bg-white rounded-xl p-6 shadow-sm hover:shadow-lg border border-gray-100 hover:border-teal-200 text-right transition-all duration-300 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+                  style={{ transitionDelay: `${i * 50}ms` }}
+                >
+                  <div className="w-12 h-12 rounded-lg bg-teal-50 flex items-center justify-center mb-4 mr-auto group-hover:bg-teal-100 transition-colors">
+                    <Icon className="w-6 h-6 text-teal-600" />
+                  </div>
+                  <h3 className="text-base font-bold text-navy-800 mb-2">{s.title}</h3>
+                  <p className="text-sm text-gray-500 leading-relaxed">{s.description}</p>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </section>
   );

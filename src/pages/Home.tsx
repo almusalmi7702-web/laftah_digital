@@ -5,6 +5,7 @@ import {
   LOGO_PATH, hero, values, whyUs, servicesList, packages,
   getWhatsAppLink, messages,
 } from '../data/content';
+import FAQSection from '../components/FAQSection';
 
 // ── Hero ──────────────────────────────────────────────────────────────────────
 const Hero = () => {
@@ -331,6 +332,7 @@ const Home = () => (
     <WhyUsPreview />
     <ServicesPreview />
     <PackagesPreview />
+    <FAQSection />
     <FinalCTA />
   </>
 );
