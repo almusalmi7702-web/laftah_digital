@@ -11,6 +11,30 @@ import ImagePlaceholder from '../components/ImagePlaceholder';
 import type { Service } from '../types/database';
 
 const staticIcons = [Instagram, ShoppingBag, Image, Palette, FileText, Presentation, Calendar];
+const SERVICES_CACHE_KEY = 'laftah_services_cache_v1';
+
+const getCachedServices = (): Service[] => {
+  if (typeof window === 'undefined') return [];
+
+  try {
+    const cached = sessionStorage.getItem(SERVICES_CACHE_KEY);
+    if (!cached) return [];
+    const parsed = JSON.parse(cached);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
+const setCachedServices = (services: Service[]) => {
+  if (typeof window === 'undefined') return;
+
+  try {
+    sessionStorage.setItem(SERVICES_CACHE_KEY, JSON.stringify(services));
+  } catch {
+    // Ignore storage errors
+  }
+};
 
 const Services = () => {
   const { ref, isInView } = useInView(0.05);
@@ -65,18 +89,20 @@ const Services = () => {
 
 const ServicesList = () => {
   const { ref, isInView } = useInView();
-  const [services, setServices] = useState<Service[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [services, setServices] = useState<Service[]>(() => getCachedServices());
+  const [loading, setLoading] = useState(() => getCachedServices().length === 0);
 
   useEffect(() => {
     let mounted = true;
 
-    const fetch = async () => {
+    const fetchServices = async () => {
       try {
         const data = await getServices();
-        if (mounted) {
-          setServices(data);
-        }
+
+        if (!mounted) return;
+
+        setServices(data);
+        setCachedServices(data);
       } catch (err) {
         console.error('Error fetching services:', err);
       } finally {
@@ -86,7 +112,7 @@ const ServicesList = () => {
       }
     };
 
-    fetch();
+    fetchServices();
 
     return () => {
       mounted = false;
@@ -95,20 +121,16 @@ const ServicesList = () => {
 
   const displayServices = services.length > 0 ? services : null;
 
-  if (loading) {
-    return (
-      <section className="py-20 bg-white">
-        <div className="flex items-center justify-center" ref={ref}>
-          <div className="w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin" />
-        </div>
-      </section>
-    );
-  }
-
   return (
     <section className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" ref={ref}>
-        {displayServices ? (
+        {loading ? (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+              <ServiceCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : displayServices ? (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {displayServices.map((s, i) => (
               <Link
@@ -125,14 +147,14 @@ const ServicesList = () => {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   ) : (
-                    <ImagePlaceholder variant="icon" />
+                    <ImagePlaceholder variant="full" />
                   )}
                 </div>
 
                 <div className="p-6">
                   <h3 className="text-base font-bold text-navy-800 mb-2">{s.title}</h3>
                   <p className="text-sm text-gray-500 leading-relaxed line-clamp-3">
-                    {s.short_description || s.details || ''}
+                    {s.short_description || ''}
                   </p>
                   {s.price && (
                     <p className="text-teal-600 font-bold text-sm mt-3">{s.price}</p>
@@ -165,5 +187,16 @@ const ServicesList = () => {
     </section>
   );
 };
+
+const ServiceCardSkeleton = () => (
+  <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+    <div className="aspect-video w-full animate-pulse bg-gray-200/70" />
+    <div className="p-6">
+      <div className="h-4 w-3/4 rounded bg-gray-200/70 animate-pulse mb-3" />
+      <div className="h-3 w-full rounded bg-gray-200/70 animate-pulse mb-2" />
+      <div className="h-3 w-2/3 rounded bg-gray-200/70 animate-pulse" />
+    </div>
+  </div>
+);
 
 export default Services;
