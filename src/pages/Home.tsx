@@ -61,7 +61,7 @@ const Hero = () => {
             </div>
           </div>
 
-          {/* Visual Area - Clean Value Proposition */}
+          {/* Visual Area */}
           <div className={`order-1 lg:order-1 transition-all duration-700 delay-200 ${isInView ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}>
             <div className="relative">
               {/* Main Visual Card */}
@@ -73,29 +73,20 @@ const Hero = () => {
                   <div className="w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
                     <Sparkles className="w-10 h-10" />
                   </div>
-                  <h3 className="text-2xl font-black mb-4">تصاميم جاهزة للنشر</h3>
+                  <h3 className="text-2xl font-black mb-4">تصاميم رقمية جاهزة للاستخدام</h3>
                   <p className="text-teal-100 text-sm leading-relaxed">
-                    نقدم لك تصاميم سوشيال ميديا احترافية ومتناسقة مع هويتك البصرية
+                    نصمم لك مواد بصرية احترافية تناسب مشروعك وتظهر هويتك بشكل واضح ومتناسق
                   </p>
                 </div>
               </div>
 
-              {/* Floating Feature Cards */}
-              <div className="absolute -top-4 -right-2 sm:-right-4 bg-white rounded-2xl p-4 shadow-xl border border-gray-100">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-teal-50 rounded-lg flex items-center justify-center">
+              {/* Identity Card */}
+              <div className="absolute -top-8 -right-1 sm:-top-7 sm:-right-4 bg-white rounded-2xl p-3 sm:p-4 shadow-xl border border-gray-100">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-teal-50 rounded-lg flex items-center justify-center">
                     <Target className="w-5 h-5 text-teal-600" />
                   </div>
-                  <span className="text-sm font-bold text-navy-800">هوية بصرية متناسقة</span>
-                </div>
-              </div>
-
-              <div className="mt-4 w-fit max-w-full bg-white rounded-2xl p-4 shadow-xl border border-gray-100">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-teal-50 rounded-lg flex items-center justify-center">
-                    <MessageCircle className="w-5 h-5 text-teal-600" />
-                  </div>
-                  <span className="text-sm font-bold text-navy-800">تواصل سريع عبر واتساب</span>
+                  <span className="text-xs sm:text-sm font-bold text-navy-800">هوية بصرية متناسقة</span>
                 </div>
               </div>
             </div>
@@ -236,8 +227,8 @@ const ServicesPreview = () => {
                     />
                   </div>
                 ) : (
-                  <div className="w-12 h-12 rounded-lg bg-teal-50 flex items-center justify-center mx-auto mb-4 group-hover:bg-teal-100 transition-colors">
-                    <Sparkles className="w-6 h-6 text-teal-600" />
+                  <div className="w-full aspect-video rounded-lg overflow-hidden mb-4 bg-gray-100">
+                    <ImagePlaceholder variant="full" />
                   </div>
                 )}
 
@@ -333,7 +324,7 @@ const PortfolioPreview = () => {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     ) : (
-                      <ImagePlaceholder />
+                      <ImagePlaceholder variant="full" />
                     )}
                   </div>
 
