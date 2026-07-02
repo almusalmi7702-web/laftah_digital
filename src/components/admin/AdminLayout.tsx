@@ -26,9 +26,13 @@ const AdminLayout = () => {
     return location.pathname.startsWith(path);
   };
 
+  const handleSignOut = async () => {
+    await signOut();
+    setSidebarOpen(false);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex" dir="rtl">
-      {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/50 lg:hidden"
@@ -36,7 +40,6 @@ const AdminLayout = () => {
         />
       )}
 
-      {/* Sidebar */}
       <aside className={`fixed top-0 right-0 z-50 h-full w-64 bg-navy-800 text-white transform transition-transform duration-300 lg:translate-x-0 ${
         sidebarOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'
       }`}>
@@ -49,13 +52,14 @@ const AdminLayout = () => {
               onError={(e) => { e.currentTarget.style.display = 'none'; }}
             />
             <button
+              type="button"
               onClick={() => setSidebarOpen(false)}
               className="lg:hidden p-2 hover:bg-white/10 rounded-lg"
+              aria-label="إغلاق القائمة"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
-          <p className="text-teal-300 text-xs mt-2">لوحة التحكم</p>
         </div>
 
         <nav className="p-4 flex-1 overflow-y-auto">
@@ -93,7 +97,8 @@ const AdminLayout = () => {
             </div>
           </div>
           <button
-            onClick={signOut}
+            type="button"
+            onClick={handleSignOut}
             className="flex items-center gap-2 w-full px-4 py-3 rounded-lg hover:bg-white/5 text-gray-300 transition-colors text-sm"
           >
             <LogOut className="w-5 h-5" />
@@ -102,26 +107,24 @@ const AdminLayout = () => {
         </div>
       </aside>
 
-      {/* Main content */}
       <main className="flex-1 lg:mr-64 w-full">
-        {/* Mobile header bar */}
         <header className="lg:hidden sticky top-0 z-30 bg-white border-b border-gray-100 shadow-sm">
           <div className="flex items-center justify-between px-4 py-3">
             <button
+              type="button"
               onClick={() => setSidebarOpen(true)}
               className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              aria-label="فتح القائمة"
             >
               <Menu className="w-6 h-6 text-navy-800" />
             </button>
-            <div className="flex items-center gap-2">
-              <img
-                src={LOGO_PATH}
-                alt="Laftah Digital"
-                style={{ maxWidth: '80px', height: 'auto', width: 'auto' }}
-                onError={(e) => { e.currentTarget.style.display = 'none'; }}
-              />
-              <span className="text-teal-600 text-xs font-bold">لوحة التحكم</span>
-            </div>
+
+            <img
+              src={LOGO_PATH}
+              alt="Laftah Digital"
+              style={{ maxWidth: '85px', height: 'auto', width: 'auto' }}
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+            />
           </div>
         </header>
 
