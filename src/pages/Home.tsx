@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Sparkles, MessageCircle, Check, Eye, Target } from 'lucide-react';
 import { useInView } from '../hooks/useInView';
@@ -5,7 +6,11 @@ import {
   LOGO_PATH, hero, values, whyUs, servicesList, packages,
   getWhatsAppLink, messages,
 } from '../data/content';
+import { getServices, getPricingPlans, getPortfolioItems } from '../services/dataService';
 import FAQSection from '../components/FAQSection';
+import ImagePlaceholder from '../components/ImagePlaceholder';
+import { CardSkeleton, PricingSkeleton, PortfolioSkeleton } from '../components/Skeleton';
+import type { Service, PricingPlan, PortfolioItem } from '../types/database';
 
 // ── Hero ──────────────────────────────────────────────────────────────────────
 const Hero = () => {
@@ -36,9 +41,9 @@ const Hero = () => {
               <span className="inline-block bg-teal-50 text-teal-700 px-4 py-2 rounded-full text-sm font-semibold mb-8">
                 {hero.badge}
               </span>
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-navy-800 leading-[1.4] mb-8">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-navy-800 leading-[1.25] mb-8">
                 نحوّل مشروعك إلى
-                <span className="block mt-2 bg-gradient-to-l from-teal-500 to-teal-600 bg-clip-text text-transparent">
+                <span className="block mt-3 bg-gradient-to-l from-teal-500 to-teal-600 bg-clip-text text-transparent">
                   حضور بصري يلفت الانتباه
                 </span>
               </h1>
@@ -151,7 +156,7 @@ const WhyUsPreview = () => {
               <div
                 key={i}
                 className={`group bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl border border-gray-100 hover:border-teal-200 transition-all duration-500 hover:-translate-y-2 text-center ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-                style={{ transitionDelay: `${i * 120}ms` }}
+                style={{ transitionDelay: `${i * 80}ms` }}
               >
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                   <Icon className="w-8 h-8 text-white" />
@@ -170,7 +175,28 @@ const WhyUsPreview = () => {
 // ── Services Preview ──────────────────────────────────────────────────────────
 const ServicesPreview = () => {
   const { ref, isInView } = useInView();
-  const preview = servicesList.slice(0, 4);
+  const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchData = async () => {
+      try {
+        const data = await getServices();
+        if (mounted) setServices(data);
+      } catch (err) {
+        console.error('Error fetching services:', err);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    fetchData();
+    return () => { mounted = false; };
+  }, []);
+
+  // Supabase data first, static fallback
+  const preview = services.length > 0 ? services.slice(0, 4) : servicesList.slice(0, 4);
+  const useSupabase = services.length > 0;
 
   return (
     <section className="py-20 bg-gray-50">
@@ -180,21 +206,36 @@ const ServicesPreview = () => {
             خدماتنا
           </h2>
         </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-          {preview.map((s, i) => (
-            <div
-              key={i}
-              className={`bg-white rounded-xl p-6 shadow-sm hover:shadow-lg border border-gray-100 hover:border-teal-200 transition-all duration-300 text-center ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-              style={{ transitionDelay: `${i * 60}ms` }}
-            >
-              <div className="w-12 h-12 rounded-lg bg-teal-50 flex items-center justify-center mx-auto mb-4">
-                <Sparkles className="w-6 h-6 text-teal-600" />
-              </div>
-              <h3 className="text-sm font-bold text-navy-800 mb-2">{s.title}</h3>
-              <p className="text-xs text-gray-500 leading-relaxed">{s.description}</p>
-            </div>
-          ))}
-        </div>
+        {loading ? (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+            {[0, 1, 2, 3].map((i) => <CardSkeleton key={i} />)}
+          </div>
+        ) : (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+            {preview.map((s, i) => (
+              <Link
+                key={useSupabase ? (s as Service).id : i}
+                to={useSupabase ? `/services/${(s as Service).slug}` : '/services'}
+                className={`group bg-white rounded-xl p-6 shadow-sm hover:shadow-lg border border-gray-100 hover:border-teal-200 transition-all duration-300 text-center ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+                style={{ transitionDelay: `${i * 50}ms` }}
+              >
+                {useSupabase && (s as Service).thumbnail_url ? (
+                  <div className="w-full aspect-video rounded-lg overflow-hidden mb-4 bg-gray-100">
+                    <img src={(s as Service).thumbnail_url!} alt={s.title} className="w-full h-full object-cover" />
+                  </div>
+                ) : (
+                  <div className="w-12 h-12 rounded-lg bg-teal-50 flex items-center justify-center mx-auto mb-4 group-hover:bg-teal-100 transition-colors">
+                    <Sparkles className="w-6 h-6 text-teal-600" />
+                  </div>
+                )}
+                <h3 className="text-sm font-bold text-navy-800 mb-2">{s.title}</h3>
+                <p className="text-xs text-gray-500 leading-relaxed line-clamp-2">
+                  {useSupabase ? ((s as Service).short_description || (s as Service).details || '') : s.description}
+                </p>
+              </Link>
+            ))}
+          </div>
+        )}
         <div className="text-center">
           <Link
             to="/services"
@@ -209,9 +250,111 @@ const ServicesPreview = () => {
   );
 };
 
+// ── Portfolio Preview ─────────────────────────────────────────────────────────
+const PortfolioPreview = () => {
+  const { ref, isInView } = useInView();
+  const [items, setItems] = useState<PortfolioItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchData = async () => {
+      try {
+        const data = await getPortfolioItems();
+        if (mounted) setItems(data);
+      } catch (err) {
+        console.error('Error fetching portfolio:', err);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    fetchData();
+    return () => { mounted = false; };
+  }, []);
+
+  if (!loading && items.length === 0) return null;
+
+  return (
+    <section className="py-20 bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" ref={ref}>
+        <div className="text-center mb-14">
+          <h2 className={`text-3xl md:text-4xl font-black text-navy-800 mb-4 transition-all duration-700 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+            أعمالنا
+          </h2>
+        </div>
+        {loading ? (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[0, 1, 2, 3].map((i) => <PortfolioSkeleton key={i} />)}
+          </div>
+        ) : (
+          <>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+              {items.slice(0, 4).map((item, i) => (
+                <Link
+                  key={item.id}
+                  to={`/portfolio/${item.slug}`}
+                  className={`group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+                  style={{ transitionDelay: `${i * 50}ms` }}
+                >
+                  <div className="aspect-video bg-gray-100 overflow-hidden">
+                    {item.thumbnail_url ? (
+                      <img src={item.thumbnail_url} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    ) : (
+                      <ImagePlaceholder />
+                    )}
+                  </div>
+                  <div className="p-4 text-right">
+                    {item.category && (
+                      <span className="inline-block bg-teal-50 text-teal-700 text-xs px-2 py-1 rounded mb-2">
+                        {item.category}
+                      </span>
+                    )}
+                    <h3 className="text-sm font-bold text-navy-800 line-clamp-1">{item.title}</h3>
+                  </div>
+                </Link>
+              ))}
+            </div>
+            <div className="text-center">
+              <Link
+                to="/portfolio"
+                className="inline-flex items-center gap-2 border-2 border-teal-500 text-teal-600 px-8 py-3 rounded-full font-bold text-sm hover:bg-teal-50 transition-all duration-300"
+              >
+                عرض جميع الأعمال
+                <ArrowLeft className="w-4 h-4" />
+              </Link>
+            </div>
+          </>
+        )}
+      </div>
+    </section>
+  );
+};
+
 // ── Packages Preview ──────────────────────────────────────────────────────────
 const PackagesPreview = () => {
   const { ref, isInView } = useInView();
+  const [plans, setPlans] = useState<PricingPlan[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchData = async () => {
+      try {
+        const data = await getPricingPlans();
+        if (mounted) setPlans(data);
+      } catch (err) {
+        console.error('Error fetching pricing plans:', err);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    fetchData();
+    return () => { mounted = false; };
+  }, []);
+
+  // Supabase data first, static fallback
+  const useSupabase = plans.length > 0;
+  const preview = useSupabase ? plans.slice(0, 3) : packages;
 
   return (
     <section className="py-20 bg-white">
@@ -224,53 +367,75 @@ const PackagesPreview = () => {
             اختر الباقة المناسبة لحضور مشروعك على السوشيال ميديا.
           </p>
         </div>
-        <div className="grid md:grid-cols-3 gap-8 items-start">
-          {packages.map((pkg, i) => (
-            <div
-              key={i}
-              className={`relative rounded-2xl p-8 transition-all duration-500 ${
-                pkg.highlighted
-                  ? 'bg-gradient-to-b from-teal-500 to-teal-600 text-white shadow-2xl shadow-teal-500/30 scale-105 z-10'
-                  : 'bg-white border border-gray-200 hover:border-teal-200 hover:shadow-xl'
-              } ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-              style={{ transitionDelay: `${i * 120}ms` }}
-            >
-              {pkg.badge && (
-                <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-amber-400 text-navy-800 px-4 py-1 rounded-full text-sm font-bold whitespace-nowrap">
-                  {pkg.badge}
-                </span>
-              )}
-              <h3 className={`text-xl font-bold mb-2 text-center ${pkg.highlighted ? 'text-white' : 'text-navy-800'}`}>
-                {pkg.name}
-              </h3>
-              <div className="flex items-baseline justify-center gap-1 mb-6">
-                <span className={`text-sm ${pkg.highlighted ? 'text-teal-100' : 'text-gray-500'}`}>ر.س</span>
-                <span className={`text-4xl font-black ${pkg.highlighted ? 'text-white' : 'text-teal-600'}`}>{pkg.price}</span>
-              </div>
-              <ul className="space-y-3 mb-8">
-                {pkg.features.map((f, fi) => (
-                  <li key={fi} className={`flex items-center gap-3 text-sm ${pkg.highlighted ? 'text-teal-50' : 'text-gray-600'}`}>
-                    <Check className={`w-4 h-4 flex-shrink-0 ${pkg.highlighted ? 'text-teal-200' : 'text-teal-500'}`} />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <a
-                href={getWhatsAppLink(pkg.message)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full font-bold text-sm transition-all duration-300 hover:-translate-y-1 ${
-                  pkg.highlighted
-                    ? 'bg-white text-teal-600 hover:shadow-lg'
-                    : 'bg-gradient-to-l from-teal-500 to-teal-600 text-white hover:shadow-lg hover:shadow-teal-500/30'
-                }`}
-              >
-                أريد {pkg.name}
-                <ArrowLeft className="w-4 h-4" />
-              </a>
-            </div>
-          ))}
-        </div>
+        {loading ? (
+          <div className="grid md:grid-cols-3 gap-8 items-start">
+            {[0, 1, 2].map((i) => <PricingSkeleton key={i} />)}
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-3 gap-8 items-start">
+            {preview.map((pkg, i) => {
+              const featured = useSupabase ? (pkg as PricingPlan).is_featured : (pkg as typeof packages[0]).highlighted;
+              const name = pkg.name;
+              const price = pkg.price;
+              const features = pkg.features;
+              const description = useSupabase ? (pkg as PricingPlan).description : undefined;
+              const message = useSupabase
+                ? `مرحبًا، أريد الاشتراك في ${name} من لفتة ديجيتال.`
+                : (pkg as typeof packages[0]).message;
+
+              return (
+                <div
+                  key={useSupabase ? (pkg as PricingPlan).id : i}
+                  className={`relative rounded-2xl p-8 transition-all duration-500 ${
+                    featured
+                      ? 'bg-gradient-to-b from-teal-500 to-teal-600 text-white shadow-2xl shadow-teal-500/30 scale-105 z-10'
+                      : 'bg-white border border-gray-200 hover:border-teal-200 hover:shadow-xl'
+                  } ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+                  style={{ transitionDelay: `${i * 80}ms` }}
+                >
+                  {!useSupabase && (pkg as typeof packages[0]).badge && (
+                    <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-amber-400 text-navy-800 px-4 py-1 rounded-full text-sm font-bold whitespace-nowrap">
+                      {(pkg as typeof packages[0]).badge}
+                    </span>
+                  )}
+                  <h3 className={`text-xl font-bold mb-2 text-center ${featured ? 'text-white' : 'text-navy-800'}`}>
+                    {name}
+                  </h3>
+                  <div className="flex items-baseline justify-center gap-1 mb-6">
+                    <span className={`text-sm ${featured ? 'text-teal-100' : 'text-gray-500'}`}>ر.س</span>
+                    <span className={`text-4xl font-black ${featured ? 'text-white' : 'text-teal-600'}`}>{price}</span>
+                  </div>
+                  <ul className="space-y-3 mb-8">
+                    {features.map((f, fi) => (
+                      <li key={fi} className={`flex items-center gap-3 text-sm ${featured ? 'text-teal-50' : 'text-gray-600'}`}>
+                        <Check className={`w-4 h-4 flex-shrink-0 ${featured ? 'text-teal-200' : 'text-teal-500'}`} />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  {description && (
+                    <p className={`text-sm mb-6 text-center ${featured ? 'text-teal-100' : 'text-gray-500'}`}>
+                      {description}
+                    </p>
+                  )}
+                  <a
+                    href={getWhatsAppLink(message)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full font-bold text-sm transition-all duration-300 hover:-translate-y-1 ${
+                      featured
+                        ? 'bg-white text-teal-600 hover:shadow-lg'
+                        : 'bg-gradient-to-l from-teal-500 to-teal-600 text-white hover:shadow-lg hover:shadow-teal-500/30'
+                    }`}
+                  >
+                    أريد {name}
+                    <ArrowLeft className="w-4 h-4" />
+                  </a>
+                </div>
+              );
+            })}
+          </div>
+        )}
         <div className="text-center mt-10">
           <Link
             to="/pricing"
@@ -331,6 +496,7 @@ const Home = () => (
     <ValueStrip />
     <WhyUsPreview />
     <ServicesPreview />
+    <PortfolioPreview />
     <PackagesPreview />
     <FAQSection />
     <FinalCTA />

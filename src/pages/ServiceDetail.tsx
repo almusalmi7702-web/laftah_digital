@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Check, MessageCircle } from 'lucide-react';
 import { getServiceBySlug } from '../services/dataService';
 import { getWhatsAppLink, servicesList as staticServices } from '../data/content';
+import ImagePlaceholder from '../components/ImagePlaceholder';
 import type { Service } from '../types/database';
 
 const ServiceDetail = () => {
@@ -81,11 +82,13 @@ const ServiceDetail = () => {
         {/* Main Card */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           {/* Image */}
-          {displayService.thumbnail_url && (
-            <div className="aspect-video w-full bg-gray-100">
+          <div className="aspect-video w-full bg-gray-100">
+            {displayService.thumbnail_url ? (
               <img src={displayService.thumbnail_url} alt={displayService.title} className="w-full h-full object-cover" />
-            </div>
-          )}
+            ) : (
+              <ImagePlaceholder />
+            )}
+          </div>
 
           {/* Content */}
           <div className="p-8">

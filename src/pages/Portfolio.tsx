@@ -4,6 +4,8 @@ import { ArrowLeft } from 'lucide-react';
 import { useInView } from '../hooks/useInView';
 import { getPortfolioItems } from '../services/dataService';
 import { portfolio as portfolioContent, getWhatsAppLink, messages } from '../data/content';
+import ImagePlaceholder from '../components/ImagePlaceholder';
+import { PortfolioSkeleton } from '../components/Skeleton';
 import type { PortfolioItem } from '../types/database';
 
 const Portfolio = () => {
@@ -61,8 +63,8 @@ const Portfolio = () => {
       {/* Content */}
       {loading ? (
         <section className="py-20 bg-white">
-          <div className="flex items-center justify-center">
-            <div className="w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin" />
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[0,1,2,3,4,5].map((i) => <PortfolioSkeleton key={i} />)}
           </div>
         </section>
       ) : error ? (
@@ -97,7 +99,7 @@ const PortfolioGrid = ({ items, isInView }: PortfolioGridProps) => {
                 {item.thumbnail_url ? (
                   <img src={item.thumbnail_url} alt={item.title} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">بدون صورة</div>
+                  <ImagePlaceholder />
                 )}
               </div>
               <div className="p-6 text-right">

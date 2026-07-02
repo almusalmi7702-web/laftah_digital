@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, ExternalLink, Calendar, MessageCircle } from 'lucide-react';
 import { getPortfolioItemBySlug, getPortfolioImages } from '../services/dataService';
 import { getWhatsAppLink, messages } from '../data/content';
+import ImagePlaceholder from '../components/ImagePlaceholder';
 import type { PortfolioItem, PortfolioImage } from '../types/database';
 
 const PortfolioDetail = () => {
@@ -65,9 +66,13 @@ const PortfolioDetail = () => {
         {/* Main Card */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           {/* Hero Image */}
-          {item.thumbnail_url && (
+          {item.thumbnail_url ? (
             <div className="aspect-video w-full bg-gray-100">
               <img src={item.thumbnail_url} alt={item.title} className="w-full h-full object-cover" />
+            </div>
+          ) : (
+            <div className="aspect-video w-full">
+              <ImagePlaceholder />
             </div>
           )}
 
