@@ -212,11 +212,15 @@ const ServicesPreview = () => {
               >
                 {useSupabase && (s as Service).thumbnail_url ? (
                   <div className="w-full aspect-video rounded-lg overflow-hidden mb-4 bg-gray-100">
-                    <img src={(s as Service).thumbnail_url!} alt={s.title} className="w-full h-full object-cover" />
+                    <img
+                      src={(s as Service).thumbnail_url!}
+                      alt={s.title}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                 ) : (
-                  <div className="w-12 h-12 rounded-lg bg-teal-50 flex items-center justify-center mx-auto mb-4 group-hover:bg-teal-100 transition-colors">
-                    <Sparkles className="w-6 h-6 text-teal-600" />
+                  <div className="w-full aspect-video rounded-lg overflow-hidden mb-4 bg-gray-100">
+                    <ImagePlaceholder variant="full" />
                   </div>
                 )}
                 <h3 className="text-sm font-bold text-navy-800 mb-2">{s.title}</h3>
@@ -479,6 +483,7 @@ const FinalCTA = () => {
     </section>
   );
 };
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 const Home = () => (
   <>
