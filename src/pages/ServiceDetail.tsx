@@ -26,7 +26,6 @@ const ServiceDetail = () => {
     fetch();
   }, [slug]);
 
-  // Fallback to static service if database doesn't have it
   const staticService = staticServices.find(s => s.title.toLowerCase().includes(slug?.toLowerCase() || ''));
 
   if (loading) {
@@ -37,7 +36,6 @@ const ServiceDetail = () => {
     );
   }
 
-  // Use database service or fallback to static
   const displayService = service || (staticService ? {
     id: '',
     title: staticService.title,
@@ -73,24 +71,20 @@ const ServiceDetail = () => {
   return (
     <div className="pt-20 bg-gray-50 min-h-screen">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Back */}
         <Link to="/services" className="inline-flex items-center gap-2 text-gray-600 hover:text-teal-600 mb-8">
           <ArrowLeft className="w-5 h-5" />
           العودة للخدمات
         </Link>
 
-        {/* Main Card */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          {/* Image */}
           <div className="aspect-video w-full bg-gray-100">
             {displayService.thumbnail_url ? (
               <img src={displayService.thumbnail_url} alt={displayService.title} className="w-full h-full object-cover" />
             ) : (
-              <ImagePlaceholder />
+              <ImagePlaceholder variant="full" />
             )}
           </div>
 
-          {/* Content */}
           <div className="p-8">
             <h1 className="text-2xl md:text-3xl font-bold text-navy-800 mb-4">{displayService.title}</h1>
 
@@ -111,7 +105,6 @@ const ServiceDetail = () => {
               </div>
             )}
 
-            {/* Features */}
             {displayService.features && displayService.features.length > 0 && (
               <div className="mb-6">
                 <h3 className="text-lg font-bold text-navy-800 mb-4">المميزات</h3>
@@ -126,7 +119,6 @@ const ServiceDetail = () => {
               </div>
             )}
 
-            {/* CTA */}
             <div className="bg-gradient-to-l from-teal-500 to-teal-600 rounded-xl p-6 text-center">
               <h3 className="text-lg font-bold text-white mb-2">هل تحتاج هذه الخدمة؟</h3>
               <p className="text-teal-100 mb-4">تواصل معنا للحصول على عرض مخصص</p>
