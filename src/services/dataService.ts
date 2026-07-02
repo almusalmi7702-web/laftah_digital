@@ -237,16 +237,19 @@ export const getServices = async (): Promise<Service[]> => {
     const { data, error } = await withTimeout<Service[]>(
       supabase
         .from('services')
-        .select('*')
+        .select('id,title,slug,short_description,thumbnail_url,price,sort_order,created_at')
         .eq('is_published', true)
         .order('sort_order', { ascending: true })
         .order('created_at', { ascending: false })
+        .limit(50),
+      6000
     );
 
     if (error) {
       console.error('Error fetching services:', error);
       return [];
     }
+
     return data || [];
   } catch (err) {
     console.error('Error fetching services:', err);
