@@ -18,7 +18,6 @@ const withTimeout = async <T,>(
   ms: number = UPLOAD_TIMEOUT_MS
 ): Promise<T> => {
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
-
   const timeout = new Promise<never>((_, reject) => {
     timeoutId = setTimeout(() => {
       reject(new Error('upload-timeout'));
