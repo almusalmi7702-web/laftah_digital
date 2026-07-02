@@ -89,7 +89,7 @@ const Hero = () => {
                 </div>  
               </div>  
   
-              <div className="absolute -bottom-4 -left-2 sm:-left-4 bg-white rounded-2xl p-4 shadow-xl border border-gray-100">  
+           <div className="mt-4 w-fit max-w-full bg-white rounded-2xl p-4 shadow-xl border border-gray-100">
                 <div className="flex items-center gap-3">  
                   <div className="w-10 h-10 bg-teal-50 rounded-lg flex items-center justify-center">  
                     <MessageCircle className="w-5 h-5 text-teal-600" />  
