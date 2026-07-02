@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, Sparkles, MessageCircle, Check, Eye, Target } from 'lucide-react';
 import { useInView } from '../hooks/useInView';
 import {
-  LOGO_PATH, hero, values, whyUs, servicesList, packages,
+  hero, values, whyUs, servicesList, packages,
   getWhatsAppLink, messages,
 } from '../data/content';
 import { getServices, getPricingPlans, getPortfolioItems } from '../services/dataService';
@@ -25,31 +25,26 @@ const Hero = () => {
         <div className="absolute bottom-10 left-1/3 w-56 h-56 bg-teal-50/50 rounded-full blur-xl" />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24" ref={ref}>
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 lg:py-24" ref={ref}>
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Content */}
           <div className="order-2 lg:order-2 text-right">
             <div className={`transition-all duration-700 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-              <div className="mb-8">
-                <img
-                  src={LOGO_PATH}
-                  alt="Laftah Digital"
-                  style={{ maxWidth: '180px', height: 'auto', width: 'auto' }}
-                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                />
-              </div>
-              <span className="inline-block bg-teal-50 text-teal-700 px-4 py-2 rounded-full text-sm font-semibold mb-8">
+              <span className="inline-block bg-teal-50 text-teal-700 px-4 py-2 rounded-full text-sm font-semibold mb-6">
                 {hero.badge}
               </span>
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-navy-800 leading-[1.25] mb-8">
+
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-navy-800 leading-[1.35] mb-8 max-w-2xl">
                 نحوّل مشروعك إلى
-                <span className="block mt-3 bg-gradient-to-l from-teal-500 to-teal-600 bg-clip-text text-transparent">
+                <span className="block mt-1 bg-gradient-to-l from-teal-500 to-teal-600 bg-clip-text text-transparent leading-[1.35]">
                   حضور بصري يلفت الانتباه
                 </span>
               </h1>
-              <p className="text-gray-600 text-lg leading-[1.9] mb-10 max-w-xl">
+
+              <p className="text-gray-600 text-base sm:text-lg leading-[1.9] mb-10 max-w-xl">
                 {hero.description}
               </p>
+
               <div className="flex flex-col sm:flex-row gap-4 justify-end">
                 <Link
                   to="/services"
@@ -73,7 +68,7 @@ const Hero = () => {
           <div className={`order-1 lg:order-1 transition-all duration-700 delay-200 ${isInView ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}>
             <div className="relative">
               {/* Main Visual Card */}
-              <div className="bg-gradient-to-br from-teal-500 to-teal-600 rounded-3xl p-10 shadow-2xl shadow-teal-500/20 relative overflow-hidden">
+              <div className="bg-gradient-to-br from-teal-500 to-teal-600 rounded-3xl p-8 sm:p-10 shadow-2xl shadow-teal-500/20 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-2xl" />
                 <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full blur-xl" />
 
@@ -89,7 +84,7 @@ const Hero = () => {
               </div>
 
               {/* Floating Feature Cards */}
-              <div className="absolute -top-4 -right-4 bg-white rounded-2xl p-4 shadow-xl border border-gray-100">
+              <div className="absolute -top-4 -right-2 sm:-right-4 bg-white rounded-2xl p-4 shadow-xl border border-gray-100">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-teal-50 rounded-lg flex items-center justify-center">
                     <Target className="w-5 h-5 text-teal-600" />
@@ -98,7 +93,7 @@ const Hero = () => {
                 </div>
               </div>
 
-              <div className="absolute -bottom-4 -left-4 bg-white rounded-2xl p-4 shadow-xl border border-gray-100">
+              <div className="absolute -bottom-4 -left-2 sm:-left-4 bg-white rounded-2xl p-4 shadow-xl border border-gray-100">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-teal-50 rounded-lg flex items-center justify-center">
                     <MessageCircle className="w-5 h-5 text-teal-600" />
