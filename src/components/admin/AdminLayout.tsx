@@ -39,7 +39,6 @@ const AdminLayout = () => {
           onClick={() => setSidebarOpen(false)}
         />
       )}
-
       <aside className={`fixed top-0 right-0 z-50 h-full w-64 bg-navy-800 text-white transform transition-transform duration-300 lg:translate-x-0 ${
         sidebarOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'
       }`}>
