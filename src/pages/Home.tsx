@@ -1,17 +1,16 @@
-import { useState, useEffect } from  react ;  
-import { Link } from  react-router-dom ;  
-import { ArrowLeft, Sparkles, MessageCircle, Check, Eye, Target } from  lucide-react ;  
-import { useInView } from  ../hooks/useInView ;  
-import {  
-  hero, values, whyUs, servicesList, packages,  
-  getWhatsAppLink, messages,  
-} from  ../data/content ;  
-import { getServices, getPricingPlans, getPortfolioItems } from  ../services/dataService ;  
-import FAQSection from  ../components/FAQSection ;  
-import ImagePlaceholder from  ../components/ImagePlaceholder ;  
-import { CardSkeleton, PricingSkeleton, PortfolioSkeleton } from  ../components/Skeleton ;  
-import type { Service, PricingPlan, PortfolioItem } from  ../types/database ;  
-  
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { ArrowLeft, Sparkles, MessageCircle, Check, Eye, Target } from 'lucide-react';
+import { useInView } from '../hooks/useInView';
+import {
+  hero, values, whyUs, servicesList, packages,
+  getWhatsAppLink, messages,
+} from '../data/content';
+import { getServices, getPricingPlans, getPortfolioItems } from '../services/dataService';
+import FAQSection from '../components/FAQSection';
+import ImagePlaceholder from '../components/ImagePlaceholder';
+import { CardSkeleton, PricingSkeleton, PortfolioSkeleton } from '../components/Skeleton';
+import type { Service, PricingPlan, PortfolioItem } from '../types/database';
 // ── Hero ──────────────────────────────────────────────────────────────────────  
 const Hero = () => {  
   const { ref, isInView } = useInView(0.05);  
