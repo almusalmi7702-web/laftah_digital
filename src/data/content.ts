@@ -21,6 +21,7 @@ export const nav = {
   pricing: "باقاتنا",
   portfolio: "أعمالنا",
   freeAudit: "تحليل مجاني",
+  faqs: "الأسئلة الشائعة",
   contact: "تواصل معنا",
 };
 
