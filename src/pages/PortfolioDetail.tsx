@@ -57,26 +57,22 @@ const PortfolioDetail = () => {
   return (
     <div className="pt-20 bg-gray-50 min-h-screen">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Back */}
         <Link to="/portfolio" className="inline-flex items-center gap-2 text-gray-600 hover:text-teal-600 mb-8">
           <ArrowLeft className="w-5 h-5" />
           العودة للأعمال
         </Link>
 
-        {/* Main Card */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          {/* Hero Image */}
           {item.thumbnail_url ? (
             <div className="aspect-video w-full bg-gray-100">
               <img src={item.thumbnail_url} alt={item.title} className="w-full h-full object-cover" />
             </div>
           ) : (
             <div className="aspect-video w-full">
-              <ImagePlaceholder />
+              <ImagePlaceholder variant="full" />
             </div>
           )}
 
-          {/* Content */}
           <div className="p-8">
             <div className="flex items-start justify-between gap-4 mb-6">
               <div>
@@ -113,7 +109,6 @@ const PortfolioDetail = () => {
             )}
           </div>
 
-          {/* Gallery */}
           {images.length > 0 && (
             <div className="px-8 pb-8">
               <h3 className="text-lg font-bold text-navy-800 mb-4">معرض الصور</h3>
@@ -127,7 +122,6 @@ const PortfolioDetail = () => {
             </div>
           )}
 
-          {/* CTA */}
           <div className="px-8 pb-8">
             <div className="bg-teal-50 rounded-xl p-6 text-center">
               <h3 className="text-lg font-bold text-navy-800 mb-2">هل تريد تصميمًا مشابهًا؟</h3>
