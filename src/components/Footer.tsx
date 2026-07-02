@@ -9,6 +9,7 @@ const Footer = () => {
     { label: nav.services,  to: '/services' },
     { label: nav.pricing,   to: '/pricing' },
     { label: nav.portfolio, to: '/portfolio' },
+    { label: nav.faqs,      to: '/faqs' },
   ];
 
   return (

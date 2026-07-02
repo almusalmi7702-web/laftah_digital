@@ -14,6 +14,7 @@ const navItems = [
   { label: nav.services,  to: '/services' },
   { label: nav.pricing,   to: '/pricing' },
   { label: nav.portfolio, to: '/portfolio' },
+  { label: nav.faqs,      to: '/faqs' },
   { label: nav.freeAudit, to: '/free-audit' },
   { label: nav.contact,   to: '/contact' },
 ];

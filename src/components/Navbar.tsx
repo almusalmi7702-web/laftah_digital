@@ -10,6 +10,7 @@ const navItems = [
   { label: nav.services,  to: '/services' },
   { label: nav.pricing,   to: '/pricing' },
   { label: nav.portfolio, to: '/portfolio' },
+  { label: nav.faqs,      to: '/faqs' },
   { label: nav.freeAudit, to: '/free-audit' },
   { label: nav.contact,   to: '/contact' },
 ];
@@ -72,7 +73,7 @@ const Navbar = () => {
                 className="inline-flex items-center gap-2 bg-gradient-to-l from-teal-500 to-teal-600 text-white px-5 py-2.5 rounded-full text-sm font-bold hover:shadow-lg hover:shadow-teal-500/30 transition-all duration-300 hover:-translate-y-0.5"
               >
                 <Sparkles className="w-4 h-4" />
-                احصل على تقييم مجاني
+                احصل على تحليل مجاني
               </a>
             </div>
 

@@ -28,14 +28,6 @@ const AdminLayout = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex" dir="rtl">
-      {/* Mobile sidebar toggle */}
-      <button
-        onClick={() => setSidebarOpen(true)}
-        className="fixed top-4 right-4 z-50 lg:hidden bg-white p-2 rounded-lg shadow-md"
-      >
-        <Menu className="w-6 h-6 text-navy-800" />
-      </button>
-
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div
@@ -111,7 +103,28 @@ const AdminLayout = () => {
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 lg:mr-64">
+      <main className="flex-1 lg:mr-64 w-full">
+        {/* Mobile header bar */}
+        <header className="lg:hidden sticky top-0 z-30 bg-white border-b border-gray-100 shadow-sm">
+          <div className="flex items-center justify-between px-4 py-3">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <Menu className="w-6 h-6 text-navy-800" />
+            </button>
+            <div className="flex items-center gap-2">
+              <img
+                src={LOGO_PATH}
+                alt="Laftah Digital"
+                style={{ maxWidth: '80px', height: 'auto', width: 'auto' }}
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+              />
+              <span className="text-teal-600 text-xs font-bold">لوحة التحكم</span>
+            </div>
+          </div>
+        </header>
+
         <div className="p-4 lg:p-8">
           <Outlet />
         </div>

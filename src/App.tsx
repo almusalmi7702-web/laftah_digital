@@ -10,6 +10,7 @@ import PortfolioDetail from './pages/PortfolioDetail';
 import ServiceDetail from './pages/ServiceDetail';
 import FreeAudit from './pages/FreeAudit';
 import Contact from './pages/Contact';
+import Faqs from './pages/Faqs';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminLayout from './components/admin/AdminLayout';
 import AdminProtectedRoute from './components/admin/AdminProtectedRoute';
@@ -38,6 +39,7 @@ function App() {
             <Route path="/portfolio" element={<Portfolio />} />
             <Route path="/portfolio/:slug" element={<PortfolioDetail />} />
             <Route path="/free-audit" element={<FreeAudit />} />
+            <Route path="/faqs" element={<Faqs />} />
             <Route path="/contact" element={<Contact />} />
           </Route>
 
