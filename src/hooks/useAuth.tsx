@@ -1,6 +1,6 @@
-import { useState, useEffect, createContext, useContext, ReactNode } from  react ;
-import { supabase } from  ../lib/supabase ;
-import type { User, Session } from  @supabase/supabase-js ;
+import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
+import { supabase } from '../lib/supabase';
+import type { User, Session } from '@supabase/supabase-js';
 
 interface AuthContextType {
   user: User | null;
@@ -23,7 +23,7 @@ const withTimeout = async <T,>(
 
   const timeout = new Promise<never>((_, reject) => {
     timeoutId = setTimeout(() => {
-      reject(new Error( انتهت مهلة الاتصال. يرجى المحاولة مرة أخرى. ));
+      reject(new Error('Ø§Ù†ØªÙ‡Øª Ù…Ù‡Ù„Ø© Ø§Ù„Ø§ØªØµØ§Ù„. ÙŠØ±Ø¬Ù‰ Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø© Ù…Ø±Ø© Ø£Ø®Ø±Ù‰.'));
     }, ms);
   });
 
@@ -38,20 +38,20 @@ const checkAdminUser = async (userId: string): Promise<boolean> => {
   try {
     const { data, error } = await withTimeout(
       supabase
-        .from( admin_users )
-        .select( id )
-        .eq( id , userId)
+        .from('admin_users')
+        .select('id')
+        .eq('id', userId)
         .maybeSingle()
     );
 
     if (error) {
-      console.error( Admin check error: , error);
+      console.error('Admin check error:', error);
       return false;
     }
 
     return Boolean(data);
   } catch (error) {
-    console.error( Admin check failed: , error);
+    console.error('Admin check failed:', error);
     return false;
   }
 };
@@ -92,7 +92,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         } = await withTimeout(supabase.auth.getSession());
 
         if (error) {
-          console.error( Session error: , error);
+          console.error('Session error:', error);
           if (mounted) {
             setSession(null);
             setUser(null);
@@ -103,7 +103,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         await applySession(session);
       } catch (error) {
-        console.error( Initial auth loading failed: , error);
+        console.error('Initial auth loading failed:', error);
 
         if (mounted) {
           setSession(null);
@@ -127,7 +127,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       try {
         await applySession(currentSession);
       } catch (error) {
-        console.error( Auth state change failed: , error);
+        console.error('Auth state change failed:', error);
 
         if (mounted) {
           setSession(currentSession);
@@ -154,8 +154,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (error) return { error: error.message };
       return { error: null };
     } catch (error: any) {
-      console.error( Sign in failed: , error);
-      return { error: error.message ||  حدث خطأ أثناء تسجيل الدخول  };
+      console.error('Sign in failed:', error);
+      return { error: error.message || 'Ø­Ø¯Ø« Ø®Ø·Ø£ Ø£Ø«Ù†Ø§Ø¡ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„' };
     }
   };
 
@@ -163,7 +163,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       await withTimeout(supabase.auth.signOut());
     } catch (error) {
-      console.error( Sign out failed: , error);
+      console.error('Sign out failed:', error);
     } finally {
       setUser(null);
       setSession(null);
@@ -183,7 +183,7 @@ export const useAuth = () => {
   const context = useContext(AuthContext);
 
   if (!context) {
-    throw new Error( useAuth must be used within AuthProvider );
+    throw new Error('useAuth must be used within AuthProvider');
   }
 
   return context;
