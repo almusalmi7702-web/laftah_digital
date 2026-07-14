@@ -86,8 +86,16 @@ const Faqs = () => {
                     onClick={() => setOpenIndex(openIndex === i ? null : i)}
                     className="w-full px-6 py-5 text-right flex items-center justify-between gap-4 hover:bg-theme-surface transition-colors"
                   >
-                    <ChevronDown className={`w-5 h-5 flex-shrink-0 text-theme-text-muted transition-transform duration-300 ${openIndex === i ? 'rotate-180 text-theme-primary' : ''}`} />
-                    <span className="font-semibold text-theme-text">{faq.question}</span>
+                    
+                    <span className="flex-1 text-right font-semibold text-theme-text">
+  {faq.question}
+</span>
+
+<ChevronDown
+  className={`w-5 h-5 flex-shrink-0 text-theme-text-muted transition-transform duration-300 ${
+    openIndex === i ?  rotate-180 text-theme-primary  :   
+  }`}
+/>
                   </button>
                   {openIndex === i && (
                     <div className="px-6 pb-5 text-right border-t border-theme-border pt-4 bg-theme-surface">
