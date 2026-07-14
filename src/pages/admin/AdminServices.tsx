@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, CreditCard as Edit, Trash2, Eye, EyeOff } from 'lucide-react';
+import { Plus, Pencil as Edit, Trash2, Eye, EyeOff } from 'lucide-react';
 import { getAllServices, deleteService, updateService } from '../../services/dataService';
 import { useToast } from '../../hooks/useToast';
 import ImagePlaceholder from '../../components/ImagePlaceholder';

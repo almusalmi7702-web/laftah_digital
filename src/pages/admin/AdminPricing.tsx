@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Trash2, Eye, EyeOff, Star, CreditCard as Edit } from 'lucide-react';
+import { Plus, Trash2, Eye, EyeOff, Star, Pencil as Edit } from 'lucide-react';
 import { getAllPricingPlans, deletePricingPlan, updatePricingPlan } from '../../services/dataService';
 import { useToast } from '../../hooks/useToast';
 import type { PricingPlan } from '../../types/database';

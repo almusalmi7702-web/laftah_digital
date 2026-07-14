@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Save, Loader2, Plus, CreditCard as Edit, Trash2, Eye, EyeOff, X, GripVertical, Facebook, Instagram, Music2, Ghost } from 'lucide-react';
+import { Save, Loader2, Plus, Pencil as Edit, Trash2, Eye, EyeOff, X, GripVertical, Facebook, Instagram, Music2, Ghost } from 'lucide-react';
 import { useToast } from '../../hooks/useToast';
 import { useSiteSettings } from '../../hooks/useSiteSettings';
 import {

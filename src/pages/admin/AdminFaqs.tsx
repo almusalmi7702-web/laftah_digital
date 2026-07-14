@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, CreditCard as Edit, Trash2, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Plus, Pencil as Edit, Trash2, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { getAllFaqs, deleteFaq, updateFaq, createFaq } from '../../services/dataService';
 import { useToast } from '../../hooks/useToast';
 import type { Faq } from '../../types/database';
