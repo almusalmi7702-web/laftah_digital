@@ -53,10 +53,19 @@ const FAQSection = () => {
                 onClick={() => setOpenIndex(openIndex === i ? null : i)}
                 className="w-full px-6 py-5 text-right flex items-center justify-between gap-4 hover:bg-theme-surface transition-colors"
               >
-                <span className={`text-lg font-bold transition-transform duration-300 ${openIndex === i ? 'rotate-180 text-theme-primary' : 'text-theme-text-muted'}`}>
-                  +
-                </span>
-                <span className="font-semibold text-theme-text">{faq.question}</span>
+<span className="flex-1 text-right font-semibold text-theme-text">
+  {faq.question}
+</span>
+
+<span
+  className={`text-lg font-bold transition-transform duration-300 ${
+    openIndex === i
+      ? 'rotate-180 text-theme-primary'
+      : 'text-theme-text-muted'
+  }`}
+>
+  +
+</span>
               </button>
               {openIndex === i && (
                 <div className="px-6 pb-5 text-right border-t border-theme-border pt-4 bg-theme-surface">
