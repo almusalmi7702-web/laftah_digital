@@ -87,13 +87,13 @@ const Faqs = () => {
                     className="w-full px-6 py-5 text-right flex items-center justify-between gap-4 hover:bg-theme-surface transition-colors"
                   >
                     
-                    <span className="flex-1 text-right font-semibold text-theme-text">
+<span className="flex-1 text-right font-semibold text-theme-text">
   {faq.question}
 </span>
 
 <ChevronDown
   className={`w-5 h-5 flex-shrink-0 text-theme-text-muted transition-transform duration-300 ${
-    openIndex === i ?  rotate-180 text-theme-primary  :   
+    openIndex === i ? 'rotate-180 text-theme-primary' : ''
   }`}
 />
                   </button>
