@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from  react ;
+import { useCallback, useEffect, useState } from 'react';
 
 export const useInView = (threshold = 0.1) => {
   const [element, setElement] = useState<HTMLElement | null>(null);
@@ -11,7 +11,7 @@ export const useInView = (threshold = 0.1) => {
   useEffect(() => {
     if (!element || isInView) return;
 
-    if (typeof IntersectionObserver ===  undefined ) {
+    if (typeof IntersectionObserver === 'undefined') {
       setIsInView(true);
       return;
     }
