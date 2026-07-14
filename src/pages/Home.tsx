@@ -443,10 +443,15 @@ const PackagesPreview = () => {
                     {name}
                   </h3>
 
-                  <div className="flex items-baseline justify-center gap-1 mb-6">
-                    <span className={`text-sm ${featured ? 'text-teal-100' : 'text-theme-text-muted'}`}>ر.س</span>
-                    <span className={`text-4xl font-black ${featured ? 'text-white' : 'text-theme-primary'}`}>{price}</span>
-                  </div>
+<div className="flex items-baseline justify-center gap-1 mb-6">
+  <span className={`text-4xl font-black ${featured ? 'text-white' : 'text-theme-primary'}`}>
+    {price}
+  </span>
+
+  <span className={`text-sm ${featured ? 'text-teal-100' : 'text-theme-text-muted'}`}>
+    ر.س
+  </span>
+</div>
 
                   <ul className="space-y-3 mb-8">
                     {features.map((f, fi) => (
