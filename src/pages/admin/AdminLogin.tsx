@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { useNavigate, useLocation, Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, LogIn } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { LOGO_PATH } from '../../data/content';
+import ThemeToggle from '../../components/ThemeToggle';
 
 const AdminLogin = () => {
-  const { signIn, user, isAdmin, loading: authLoading } = useAuth();
-  const navigate = useNavigate();
+  const { signIn, user, isAdmin, loading: authLoading, adminChecked } = useAuth();
   const location = useLocation();
 
   const [email, setEmail] = useState('');
@@ -15,17 +15,23 @@ const AdminLogin = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Already logged in
-  if (authLoading) {
+  // Still resolving session/admin: show spinner, not the login form.
+  if (authLoading || (user && !adminChecked)) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center" dir="rtl">
-        <div className="w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-theme-page flex items-center justify-center" dir="rtl">
+        <div className="text-center">
+          <div className="w-10 h-10 border-4 border-theme-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-theme-text-secondary text-sm">جاري التحقق من الصلاحية...</p>
+        </div>
       </div>
     );
   }
 
-  if (user && isAdmin) {
-    const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/admin';
+  // Fully verified admin — redirect immediately, no setTimeout.
+  if (user && isAdmin && adminChecked) {
+    const from =
+      (location.state as { from?: { pathname: string } })?.from?.pathname ||
+      '/admin';
     return <Navigate to={from} replace />;
   }
 
@@ -39,33 +45,33 @@ const AdminLogin = () => {
     if (result.error) {
       setError(result.error);
       setLoading(false);
-    } else {
-      // Navigation will happen automatically via auth state change
-      setTimeout(() => {
-        navigate('/admin');
-      }, 500);
     }
+    // On success, onAuthStateChange fires and the redirect above takes over.
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4" dir="rtl">
+    <div className="min-h-screen bg-theme-page flex items-center justify-center p-4" dir="rtl">
+      <div className="absolute top-5 left-5">
+        <ThemeToggle />
+      </div>
       <div className="max-w-md w-full">
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
+        <div className="bg-theme-surface rounded-2xl shadow-theme-elevated border border-theme-border p-8">
           <div className="text-center mb-8">
-            <img
-              src={LOGO_PATH}
-              alt="Laftah Digital"
-              style={{ maxWidth: '120px', height: 'auto', width: 'auto' }}
-              className="mx-auto mb-4"
-              onError={(e) => { e.currentTarget.style.display = 'none'; }}
-            />
-            <h1 className="text-xl font-bold text-navy-800">لوحة التحكم</h1>
-            <p className="text-gray-500 text-sm mt-1">سجل دخول للوصول إلى لوحة التحكم</p>
+            <div className="inline-flex items-center justify-center mb-4 rounded-2xl bg-theme-muted p-3">
+              <img
+                src={LOGO_PATH}
+                alt="Laftah Digital"
+                style={{ maxWidth: '120px', height: 'auto', width: 'auto' }}
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+              />
+            </div>
+            <h1 className="text-xl font-bold text-theme-text">لوحة التحكم</h1>
+            <p className="text-theme-text-secondary text-sm mt-1">سجل دخول للوصول إلى لوحة التحكم</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label htmlFor="email" className="block text-navy-800 font-semibold text-sm mb-2 text-right">
+              <label htmlFor="email" className="block text-theme-text font-semibold text-sm mb-2 text-right">
                 البريد الإلكتروني
               </label>
               <input
@@ -75,13 +81,13 @@ const AdminLogin = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@example.com"
                 required
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl border border-theme-input-border bg-theme-input text-theme-text focus:border-theme-primary focus:ring-2 focus:ring-theme-primary/20 outline-none transition-all placeholder:text-theme-text-muted"
                 dir="ltr"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-navy-800 font-semibold text-sm mb-2 text-right">
+              <label htmlFor="password" className="block text-theme-text font-semibold text-sm mb-2 text-right">
                 كلمة المرور
               </label>
               <div className="relative">
@@ -92,13 +98,13 @@ const AdminLogin = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-theme-input-border bg-theme-input text-theme-text focus:border-theme-primary focus:ring-2 focus:ring-theme-primary/20 outline-none transition-all placeholder:text-theme-text-muted"
                   dir="ltr"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-theme-text-muted hover:text-theme-text"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -106,7 +112,7 @@ const AdminLogin = () => {
             </div>
 
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm text-center">
+              <div className="bg-theme-danger-soft border border-theme-danger/30 text-theme-danger px-4 py-3 rounded-lg text-sm text-center">
                 {error}
               </div>
             )}
@@ -130,7 +136,7 @@ const AdminLogin = () => {
           <div className="mt-6 text-center">
             <a
               href="/"
-              className="text-teal-600 text-sm font-medium hover:underline"
+              className="text-theme-primary text-sm font-medium hover:underline"
             >
               العودة للموقع الرئيسي
             </a>

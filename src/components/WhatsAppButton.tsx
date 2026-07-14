@@ -1,16 +1,19 @@
 import { useState, useEffect } from 'react';
-import { getWhatsAppLink, messages } from '../data/content';
+import { useSiteSettings } from '../hooks/useSiteSettings';
+import { messages } from '../data/content';
 
 const WhatsAppButton = () => {
+  const { siteSettings, getWhatsAppLink } = useSiteSettings();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     const handle = () => setVisible(window.scrollY > 80);
     window.addEventListener('scroll', handle, { passive: true });
-    // Check initial position
     handle();
     return () => window.removeEventListener('scroll', handle);
   }, []);
+
+  if (!siteSettings.whatsapp_enabled) return null;
 
   return (
     <a
@@ -23,7 +26,7 @@ const WhatsAppButton = () => {
       }`}
     >
       {/* Tooltip label */}
-      <span className="hidden sm:block bg-white text-navy-800 font-bold text-sm px-4 py-2 rounded-full shadow-lg whitespace-nowrap mr-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+      <span className="hidden sm:block bg-theme-surface text-theme-text font-bold text-sm px-4 py-2 rounded-full shadow-lg whitespace-nowrap mr-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
         تواصل معنا
       </span>
       {/* Button */}

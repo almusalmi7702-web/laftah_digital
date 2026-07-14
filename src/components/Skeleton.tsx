@@ -3,11 +3,11 @@ interface SkeletonProps {
 }
 
 const Skeleton = ({ className = '' }: SkeletonProps) => (
-  <div className={`animate-pulse bg-gray-200/60 rounded-xl ${className}`} />
+  <div className={`animate-pulse bg-theme-muted rounded-xl ${className}`} />
 );
 
 export const CardSkeleton = () => (
-  <div className="bg-white rounded-xl p-6 border border-gray-100">
+  <div className="bg-theme-surface rounded-xl p-6 border border-theme-border">
     <Skeleton className="w-12 h-12 rounded-lg mb-4" />
     <Skeleton className="h-4 w-3/4 mb-2" />
     <Skeleton className="h-3 w-full mb-1" />
@@ -16,7 +16,7 @@ export const CardSkeleton = () => (
 );
 
 export const PricingSkeleton = () => (
-  <div className="bg-white rounded-2xl p-8 border border-gray-200">
+  <div className="bg-theme-surface rounded-2xl p-8 border border-theme-border">
     <Skeleton className="h-5 w-1/2 mb-4" />
     <Skeleton className="h-10 w-1/3 mb-8" />
     <div className="space-y-3 mb-8">
@@ -30,7 +30,7 @@ export const PricingSkeleton = () => (
 );
 
 export const PortfolioSkeleton = () => (
-  <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+  <div className="bg-theme-surface rounded-2xl border border-theme-border overflow-hidden">
     <Skeleton className="aspect-video w-full rounded-none" />
     <div className="p-6">
       <Skeleton className="h-4 w-1/4 mb-2" />

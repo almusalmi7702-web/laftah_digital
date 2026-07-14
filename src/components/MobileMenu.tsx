@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { X, Sparkles } from 'lucide-react';
-import { LOGO_PATH, nav, getWhatsAppLink, messages } from '../data/content';
+import { LOGO_PATH, nav, messages } from '../data/content';
+import { useSiteSettings } from '../hooks/useSiteSettings';
+import ThemeToggle from './ThemeToggle';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -22,6 +24,7 @@ const navItems = [
 const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
   const [visible, setVisible] = useState(false);
   const [animating, setAnimating] = useState(false);
+  const { siteSettings, getWhatsAppLink } = useSiteSettings();
 
   useEffect(() => {
     if (isOpen) {
@@ -53,18 +56,19 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
 
       {/* Drawer from right */}
       <div
-        className={`fixed top-0 right-0 bottom-0 z-50 w-[300px] bg-white shadow-2xl flex flex-col transition-transform duration-350 ease-out ${
+        className={`fixed top-0 right-0 bottom-0 z-50 w-[300px] bg-theme-surface shadow-2xl flex flex-col transition-transform duration-350 ease-out ${
           visible ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-theme-border">
+          <ThemeToggle />
           <button
             onClick={onClose}
             aria-label="إغلاق القائمة"
-            className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-theme-muted hover:bg-theme-elevated transition-colors"
           >
-            <X className="w-5 h-5 text-navy-800" />
+            <X className="w-5 h-5 text-theme-text" />
           </button>
           <img
             src={LOGO_PATH}
@@ -85,8 +89,8 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
               className={({ isActive }) =>
                 `block px-4 py-3.5 rounded-xl font-semibold text-base transition-all duration-200 text-right ${
                   isActive
-                    ? 'bg-teal-50 text-teal-600'
-                    : 'text-navy-800 hover:bg-gray-50 hover:text-teal-600'
+                    ? 'bg-theme-primary-soft text-theme-primary'
+                    : 'text-theme-text hover:bg-theme-muted hover:text-theme-primary'
                 }`
               }
             >
@@ -96,18 +100,20 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
         </nav>
 
         {/* CTA */}
-        <div className="px-4 pb-8 pt-4 border-t border-gray-100">
-          <a
-            href={getWhatsAppLink(messages.freeAudit)}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={onClose}
-            className="flex items-center justify-center gap-2 w-full bg-gradient-to-l from-teal-500 to-teal-600 text-white px-6 py-3.5 rounded-full font-bold text-sm hover:shadow-lg hover:shadow-teal-500/30 transition-all duration-300"
-          >
-            <Sparkles className="w-4 h-4" />
-            احصل على تحليل مجاني
-          </a>
-        </div>
+        {siteSettings.whatsapp_enabled && (
+          <div className="px-4 pb-8 pt-4 border-t border-theme-border">
+            <a
+              href={getWhatsAppLink(messages.freeAudit)}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={onClose}
+              className="flex items-center justify-center gap-2 w-full bg-gradient-to-l from-teal-500 to-teal-600 text-white px-6 py-3.5 rounded-full font-bold text-sm hover:shadow-lg hover:shadow-teal-500/30 transition-all duration-300"
+            >
+              <Sparkles className="w-4 h-4" />
+              احصل على تحليل مجاني
+            </a>
+          </div>
+        )}
       </div>
     </>
   );

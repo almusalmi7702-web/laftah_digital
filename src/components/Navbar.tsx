@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Menu, Sparkles } from 'lucide-react';
-import { LOGO_PATH, nav, getWhatsAppLink, messages } from '../data/content';
+import { LOGO_PATH, nav, messages } from '../data/content';
+import { useSiteSettings } from '../hooks/useSiteSettings';
 import MobileMenu from './MobileMenu';
+import ThemeToggle from './ThemeToggle';
 
 const navItems = [
   { label: nav.home,      to: '/' },
@@ -18,6 +20,7 @@ const navItems = [
 const Navbar = () => {
   const [scrolled, setScrolled]   = useState(false);
   const [menuOpen, setMenuOpen]   = useState(false);
+  const { siteSettings, getWhatsAppLink } = useSiteSettings();
 
   useEffect(() => {
     const handle = () => setScrolled(window.scrollY > 50);
@@ -30,7 +33,7 @@ const Navbar = () => {
       <nav
         className={`fixed top-0 right-0 left-0 z-30 transition-all duration-300 ${
           scrolled
-            ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100'
+            ? 'bg-theme-surface/95 backdrop-blur-md shadow-sm border-b border-theme-border'
             : 'bg-transparent'
         }`}
       >
@@ -55,7 +58,7 @@ const Navbar = () => {
                   end={to === '/'}
                   className={({ isActive }) =>
                     `text-sm font-semibold transition-colors duration-200 ${
-                      isActive ? 'text-teal-600' : 'text-navy-700 hover:text-teal-600'
+                      isActive ? 'text-theme-primary' : 'text-theme-text hover:text-theme-primary'
                     }`
                   }
                 >
@@ -64,27 +67,33 @@ const Navbar = () => {
               ))}
             </div>
 
-            {/* Desktop CTA */}
-            <div className="hidden lg:block">
-              <a
-                href={getWhatsAppLink(messages.freeAudit)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-gradient-to-l from-teal-500 to-teal-600 text-white px-5 py-2.5 rounded-full text-sm font-bold hover:shadow-lg hover:shadow-teal-500/30 transition-all duration-300 hover:-translate-y-0.5"
-              >
-                <Sparkles className="w-4 h-4" />
-                احصل على تحليل مجاني
-              </a>
+            {/* Desktop CTA + theme toggle */}
+            <div className="hidden lg:flex items-center gap-3">
+              <ThemeToggle />
+              {siteSettings.whatsapp_enabled && (
+                <a
+                  href={getWhatsAppLink(messages.freeAudit)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-gradient-to-l from-teal-500 to-teal-600 text-white px-5 py-2.5 rounded-full text-sm font-bold hover:shadow-lg hover:shadow-teal-500/30 transition-all duration-300 hover:-translate-y-0.5"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  احصل على تحليل مجاني
+                </a>
+              )}
             </div>
 
-            {/* Mobile menu button */}
-            <button
-              onClick={() => setMenuOpen(true)}
-              aria-label="فتح القائمة"
-              className="lg:hidden w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors text-navy-800"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
+            {/* Mobile controls */}
+            <div className="flex lg:hidden items-center gap-2">
+              <ThemeToggle />
+              <button
+                onClick={() => setMenuOpen(true)}
+                aria-label="فتح القائمة"
+                className="w-10 h-10 flex items-center justify-center rounded-xl bg-theme-muted hover:bg-theme-elevated transition-colors text-theme-text"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+            </div>
           </div>
         </div>
       </nav>

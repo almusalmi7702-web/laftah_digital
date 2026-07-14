@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Briefcase, Layers, Tag, HelpCircle,
   Settings, LogOut, Menu, X, ChevronLeft
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { LOGO_PATH } from '../../data/content';
+import ThemeToggle from '../../components/ThemeToggle';
 
 const sidebarItems = [
   { icon: LayoutDashboard, label: 'لوحة التحكم', path: '/admin' },
@@ -19,6 +20,7 @@ const sidebarItems = [
 const AdminLayout = () => {
   const { signOut, user } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const isActive = (path: string) => {
@@ -29,27 +31,30 @@ const AdminLayout = () => {
   const handleSignOut = async () => {
     await signOut();
     setSidebarOpen(false);
+    navigate('/admin/login', { replace: true });
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex" dir="rtl">
+    <div className="min-h-screen bg-theme-page flex" dir="rtl">
       {sidebarOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/50 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
-      <aside className={`fixed top-0 right-0 z-50 h-full w-64 bg-navy-800 text-white transform transition-transform duration-300 lg:translate-x-0 ${
+      <aside className={`fixed top-0 right-0 z-50 h-full w-64 bg-theme-nav text-white transform transition-transform duration-300 lg:translate-x-0 ${
         sidebarOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'
       }`}>
         <div className="p-6 border-b border-white/10">
           <div className="flex items-center justify-between">
-            <img
-              src={LOGO_PATH}
-              alt="Laftah Digital"
-              style={{ maxWidth: '100px', height: 'auto', width: 'auto' }}
-              onError={(e) => { e.currentTarget.style.display = 'none'; }}
-            />
+            <div className="inline-flex items-center justify-center rounded-xl bg-white/10 p-2">
+              <img
+                src={LOGO_PATH}
+                alt="Laftah Digital"
+                style={{ maxWidth: '100px', height: 'auto', width: 'auto' }}
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+              />
+            </div>
             <button
               type="button"
               onClick={() => setSidebarOpen(false)}
@@ -86,13 +91,16 @@ const AdminLayout = () => {
         </nav>
 
         <div className="p-4 border-t border-white/10">
-          <div className="flex items-center gap-3 mb-4 px-4">
-            <div className="w-8 h-8 rounded-full bg-teal-500 flex items-center justify-center text-sm font-bold">
-              {user?.email?.charAt(0).toUpperCase()}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{user?.email}</p>
-              <p className="text-xs text-gray-400">مدير</p>
+          <div className="flex items-center justify-between mb-4 px-4">
+            <ThemeToggle className="bg-white/10 hover:bg-white/20" />
+            <div className="flex items-center gap-3 flex-1 min-w-0 mr-2">
+              <div className="w-8 h-8 rounded-full bg-teal-500 flex items-center justify-center text-sm font-bold flex-shrink-0">
+                {user?.email?.charAt(0).toUpperCase()}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">{user?.email}</p>
+                <p className="text-xs text-gray-400">مدير</p>
+              </div>
             </div>
           </div>
           <button
@@ -107,15 +115,15 @@ const AdminLayout = () => {
       </aside>
 
       <main className="flex-1 lg:mr-64 w-full">
-        <header className="lg:hidden sticky top-0 z-30 bg-white border-b border-gray-100 shadow-sm">
+        <header className="lg:hidden sticky top-0 z-30 bg-theme-surface border-b border-theme-border shadow-sm">
           <div className="flex items-center justify-between px-4 py-3">
             <button
               type="button"
               onClick={() => setSidebarOpen(true)}
-              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              className="p-2 rounded-lg hover:bg-theme-muted transition-colors"
               aria-label="فتح القائمة"
             >
-              <Menu className="w-6 h-6 text-navy-800" />
+              <Menu className="w-6 h-6 text-theme-text" />
             </button>
 
             <img

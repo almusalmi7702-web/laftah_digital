@@ -21,9 +21,9 @@ const Toast = ({ toast, onClose }: ToastProps) => {
   }, [toast.id, onClose]);
 
   const config = {
-    success: { icon: CheckCircle, bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-700' },
-    error: { icon: XCircle, bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-700' },
-    info: { icon: Info, bg: 'bg-teal-50', border: 'border-teal-200', text: 'text-teal-700' },
+    success: { icon: CheckCircle, bg: 'bg-theme-success-soft', border: 'border-theme-success/30', text: 'text-theme-success' },
+    error: { icon: XCircle, bg: 'bg-theme-danger-soft', border: 'border-theme-danger/30', text: 'text-theme-danger' },
+    info: { icon: Info, bg: 'bg-theme-primary-soft', border: 'border-theme-primary/30', text: 'text-theme-primary' },
   };
 
   const { icon: Icon, bg, border, text } = config[toast.type];

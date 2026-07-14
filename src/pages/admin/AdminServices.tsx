@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Edit, Trash2, Eye, EyeOff } from 'lucide-react';
+import { Plus, CreditCard as Edit, Trash2, Eye, EyeOff } from 'lucide-react';
 import { getAllServices, deleteService, updateService } from '../../services/dataService';
 import { useToast } from '../../hooks/useToast';
 import ImagePlaceholder from '../../components/ImagePlaceholder';
@@ -58,8 +58,8 @@ const AdminServices = () => {
       <div>
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-navy-800">إدارة الخدمات</h1>
-            <p className="text-gray-500 mt-1">إضافة وتعديل وحذف الخدمات</p>
+            <h1 className="text-2xl font-bold text-theme-text">إدارة الخدمات</h1>
+            <p className="text-theme-text-secondary mt-1">إضافة وتعديل وحذف الخدمات</p>
           </div>
           <Link to="/admin/services/new" className="inline-flex items-center gap-2 bg-gradient-to-l from-teal-500 to-teal-600 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:shadow-lg transition-all">
             <Plus className="w-4 h-4" /> إضافة خدمة جديدة
@@ -67,30 +67,30 @@ const AdminServices = () => {
         </div>
 
         {items.length === 0 ? (
-          <div className="bg-white rounded-xl p-12 text-center border border-gray-100">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4"><Plus className="w-8 h-8 text-gray-400" /></div>
-            <h3 className="text-lg font-bold text-navy-800 mb-2">لا توجد خدمات</h3>
-            <p className="text-gray-500 mb-6">ابدأ بإضافة أول خدمة</p>
-            <Link to="/admin/services/new" className="inline-flex items-center gap-2 bg-teal-500 text-white px-6 py-3 rounded-lg font-semibold"><Plus className="w-5 h-5" /> إضافة خدمة</Link>
+          <div className="bg-theme-surface rounded-xl p-12 text-center border border-theme-border">
+            <div className="w-16 h-16 bg-theme-muted rounded-full flex items-center justify-center mx-auto mb-4"><Plus className="w-8 h-8 text-theme-text-muted" /></div>
+            <h3 className="text-lg font-bold text-theme-text mb-2">لا توجد خدمات</h3>
+            <p className="text-theme-text-secondary mb-6">ابدأ بإضافة أول خدمة</p>
+            <Link to="/admin/services/new" className="inline-flex items-center gap-2 bg-theme-primary text-white px-6 py-3 rounded-lg font-semibold"><Plus className="w-5 h-5" /> إضافة خدمة</Link>
           </div>
         ) : (
           /* Mobile: cards, Desktop: table with horizontal scroll fallback */
           <>
             {/* Desktop table */}
-            <div className="hidden md:block bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="hidden md:block bg-theme-surface rounded-xl shadow-sm border border-theme-border overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-100">
+                  <thead className="bg-theme-muted border-b border-theme-border">
                     <tr>
-                      <th className="text-right px-6 py-4 font-semibold text-navy-800 whitespace-nowrap">الخدمة</th>
-                      <th className="text-right px-6 py-4 font-semibold text-navy-800 whitespace-nowrap">الحالة</th>
-                      <th className="text-right px-6 py-4 font-semibold text-navy-800 whitespace-nowrap">الترتيب</th>
-                      <th className="text-center px-6 py-4 font-semibold text-navy-800 whitespace-nowrap">إجراءات</th>
+                      <th className="text-right px-6 py-4 font-semibold text-theme-text whitespace-nowrap">الخدمة</th>
+                      <th className="text-right px-6 py-4 font-semibold text-theme-text whitespace-nowrap">الحالة</th>
+                      <th className="text-right px-6 py-4 font-semibold text-theme-text whitespace-nowrap">الترتيب</th>
+                      <th className="text-center px-6 py-4 font-semibold text-theme-text whitespace-nowrap">إجراءات</th>
                     </tr>
                   </thead>
                   <tbody>
                     {items.map((item) => (
-                      <tr key={item.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                      <tr key={item.id} className="border-b border-theme-border hover:bg-theme-muted transition-colors">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-4">
                             {item.thumbnail_url ? (
@@ -101,22 +101,22 @@ const AdminServices = () => {
                               </div>
                             )}
                             <div>
-                              <p className="font-bold text-navy-800">{item.title}</p>
-                              <p className="text-gray-500 text-sm line-clamp-1">{item.short_description}</p>
+                              <p className="font-bold text-theme-text">{item.title}</p>
+                              <p className="text-theme-text-secondary text-sm line-clamp-1">{item.short_description}</p>
                             </div>
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${item.is_published ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
+                          <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${item.is_published ? 'bg-theme-success-soft text-theme-success' : 'bg-theme-muted text-theme-text-secondary'}`}>
                             {item.is_published ? 'منشور' : 'مخفي'}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-gray-600">{item.sort_order}</td>
+                        <td className="px-6 py-4 text-theme-text-secondary">{item.sort_order}</td>
                         <td className="px-6 py-4">
                           <div className="flex items-center justify-center gap-1">
-                            <button onClick={() => togglePublished(item)} className="p-2 text-gray-500 hover:text-teal-600 hover:bg-teal-50 rounded-lg transition-colors">{item.is_published ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}</button>
-                            <Link to={`/admin/services/${item.id}/edit`} className="p-2 text-gray-500 hover:text-teal-600 hover:bg-teal-50 rounded-lg transition-colors"><Edit className="w-5 h-5" /></Link>
-                            <button onClick={() => setDeleteId(item.id)} className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"><Trash2 className="w-5 h-5" /></button>
+                            <button onClick={() => togglePublished(item)} className="p-2 text-theme-text-secondary hover:text-theme-primary hover:bg-theme-primary-soft rounded-lg transition-colors">{item.is_published ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}</button>
+                            <Link to={`/admin/services/${item.id}/edit`} className="p-2 text-theme-text-secondary hover:text-theme-primary hover:bg-theme-primary-soft rounded-lg transition-colors"><Edit className="w-5 h-5" /></Link>
+                            <button onClick={() => setDeleteId(item.id)} className="p-2 text-theme-text-secondary hover:text-theme-danger hover:bg-theme-danger-soft rounded-lg transition-colors"><Trash2 className="w-5 h-5" /></button>
                           </div>
                         </td>
                       </tr>
@@ -129,7 +129,7 @@ const AdminServices = () => {
             {/* Mobile cards */}
             <div className="md:hidden space-y-4">
               {items.map((item) => (
-                <div key={item.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+                <div key={item.id} className="bg-theme-surface rounded-xl shadow-sm border border-theme-border p-4">
                   <div className="flex items-start gap-3">
                     {item.thumbnail_url ? (
                       <img src={item.thumbnail_url} alt="" className="w-14 h-14 rounded-lg object-cover flex-shrink-0" />
@@ -139,17 +139,17 @@ const AdminServices = () => {
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="font-bold text-navy-800">{item.title}</p>
-                      <p className="text-gray-500 text-sm line-clamp-1">{item.short_description}</p>
-                      <span className={`inline-block mt-1 px-2 py-0.5 rounded text-xs font-semibold ${item.is_published ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
+                      <p className="font-bold text-theme-text">{item.title}</p>
+                      <p className="text-theme-text-secondary text-sm line-clamp-1">{item.short_description}</p>
+                      <span className={`inline-block mt-1 px-2 py-0.5 rounded text-xs font-semibold ${item.is_published ? 'bg-theme-success-soft text-theme-success' : 'bg-theme-muted text-theme-text-secondary'}`}>
                         {item.is_published ? 'منشور' : 'مخفي'}
                       </span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
-                    <button onClick={() => togglePublished(item)} className="p-2 text-gray-500 hover:text-teal-600 hover:bg-teal-50 rounded-lg transition-colors">{item.is_published ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}</button>
-                    <Link to={`/admin/services/${item.id}/edit`} className="p-2 text-gray-500 hover:text-teal-600 hover:bg-teal-50 rounded-lg transition-colors"><Edit className="w-5 h-5" /></Link>
-                    <button onClick={() => setDeleteId(item.id)} className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors mr-auto"><Trash2 className="w-5 h-5" /></button>
+                  <div className="flex items-center gap-2 mt-3 pt-3 border-t border-theme-border">
+                    <button onClick={() => togglePublished(item)} className="p-2 text-theme-text-secondary hover:text-theme-primary hover:bg-theme-primary-soft rounded-lg transition-colors">{item.is_published ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}</button>
+                    <Link to={`/admin/services/${item.id}/edit`} className="p-2 text-theme-text-secondary hover:text-theme-primary hover:bg-theme-primary-soft rounded-lg transition-colors"><Edit className="w-5 h-5" /></Link>
+                    <button onClick={() => setDeleteId(item.id)} className="p-2 text-theme-text-secondary hover:text-theme-danger hover:bg-theme-danger-soft rounded-lg transition-colors mr-auto"><Trash2 className="w-5 h-5" /></button>
                   </div>
                 </div>
               ))}
@@ -159,13 +159,13 @@ const AdminServices = () => {
 
         {deleteId && (
           <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-xl p-6 max-w-sm w-full text-center">
-              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4"><Trash2 className="w-8 h-8 text-red-600" /></div>
-              <h3 className="text-lg font-bold text-navy-800 mb-2">تأكيد الحذف</h3>
-              <p className="text-gray-600 mb-6">هل أنت متأكد من حذف هذه الخدمة؟</p>
+            <div className="bg-theme-surface rounded-xl p-6 max-w-sm w-full text-center">
+              <div className="w-16 h-16 bg-theme-danger-soft rounded-full flex items-center justify-center mx-auto mb-4"><Trash2 className="w-8 h-8 text-theme-danger" /></div>
+              <h3 className="text-lg font-bold text-theme-text mb-2">تأكيد الحذف</h3>
+              <p className="text-theme-text-secondary mb-6">هل أنت متأكد من حذف هذه الخدمة؟</p>
               <div className="flex gap-3">
-                <button onClick={() => setDeleteId(null)} className="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg font-semibold text-gray-600 hover:bg-gray-50">إلغاء</button>
-                <button onClick={handleDelete} className="flex-1 px-2 py-2.5 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600">حذف</button>
+                <button onClick={() => setDeleteId(null)} className="flex-1 px-4 py-2.5 border border-theme-border rounded-lg font-semibold text-theme-text-secondary hover:bg-theme-muted">إلغاء</button>
+                <button onClick={handleDelete} className="flex-1 px-2 py-2.5 bg-theme-danger text-white rounded-lg font-semibold hover:opacity-90">حذف</button>
               </div>
             </div>
           </div>

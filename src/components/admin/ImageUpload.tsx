@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Upload, Trash2, Loader2, ImageIcon } from 'lucide-react';
+import { Upload, Trash2, Loader2, Image as ImageIcon } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
 interface ImageUploadProps {
@@ -171,18 +171,18 @@ const ImageUpload = ({
 
   return (
     <div>
-      <label className="block text-navy-800 font-semibold text-sm mb-2">{label}</label>
+      <label className="block text-theme-text font-semibold text-sm mb-2">{label}</label>
 
       {value ? (
         <div className="relative group">
-          <div className="aspect-video w-full rounded-xl overflow-hidden border border-gray-200 bg-gray-100">
+          <div className="aspect-video w-full rounded-xl overflow-hidden border border-theme-input-border bg-theme-muted">
             <img src={value} alt="معاينة" className="w-full h-full object-cover" />
           </div>
 
           <button
             type="button"
             onClick={handleRemove}
-            className="absolute top-2 left-2 bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 transition-colors shadow-lg md:opacity-0 md:group-hover:opacity-100"
+            className="absolute top-2 left-2 bg-theme-danger text-white p-2 rounded-lg hover:opacity-90 transition-colors shadow-lg md:opacity-0 md:group-hover:opacity-100"
             title="إزالة الصورة"
           >
             <Trash2 className="w-4 h-4" />
@@ -193,21 +193,21 @@ const ImageUpload = ({
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={uploading}
-          className="w-full aspect-video rounded-xl border-2 border-dashed border-gray-300 hover:border-teal-400 hover:bg-teal-50/50 transition-all flex flex-col items-center justify-center gap-2 text-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full aspect-video rounded-xl border-2 border-dashed border-theme-input-border hover:border-theme-primary hover:bg-theme-primary-soft transition-all flex flex-col items-center justify-center gap-2 text-theme-text-secondary disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {uploading ? (
             <>
-              <Loader2 className="w-8 h-8 animate-spin text-teal-500" />
+              <Loader2 className="w-8 h-8 animate-spin text-theme-primary" />
               <span className="text-sm font-semibold">جاري الرفع...</span>
             </>
           ) : (
             <>
-              <div className="w-12 h-12 rounded-full bg-teal-50 flex items-center justify-center">
-                <Upload className="w-6 h-6 text-teal-600" />
+              <div className="w-12 h-12 rounded-full bg-theme-primary-soft flex items-center justify-center">
+                <Upload className="w-6 h-6 text-theme-primary" />
               </div>
               <span className="text-sm font-semibold">اضغط لرفع صورة</span>
-              <span className="text-xs text-gray-400">JPG, PNG, WebP — حتى {maxSizeMB}MB</span>
-              <span className="inline-flex items-center gap-1 text-[11px] text-gray-400">
+              <span className="text-xs text-theme-text-muted">JPG, PNG, WebP — حتى {maxSizeMB}MB</span>
+              <span className="inline-flex items-center gap-1 text-[11px] text-theme-text-muted">
                 <ImageIcon className="w-3 h-3" />
                 سيتم حفظ الصورة في Supabase Storage
               </span>
@@ -217,7 +217,7 @@ const ImageUpload = ({
       )}
 
       {error && (
-        <p className="text-red-500 text-sm mt-2 leading-relaxed">{error}</p>
+        <p className="text-theme-danger text-sm mt-2 leading-relaxed">{error}</p>
       )}
 
       <input

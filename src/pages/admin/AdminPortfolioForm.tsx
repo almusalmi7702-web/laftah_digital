@@ -123,39 +123,39 @@ const AdminPortfolioForm = () => {
       {ToastPortal}
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center gap-4 mb-8">
-          <Link to="/admin/portfolio" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+          <Link to="/admin/portfolio" className="p-2 hover:bg-theme-muted rounded-lg transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-2xl font-bold text-navy-800">
+            <h1 className="text-2xl font-bold text-theme-text">
               {isEdit ? 'تعديل العمل' : 'إضافة عمل جديد'}
             </h1>
-            <p className="text-gray-500 mt-1">أدخل تفاصيل العمل</p>
+            <p className="text-theme-text-secondary mt-1">أدخل تفاصيل العمل</p>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="bg-theme-surface rounded-xl shadow-sm border border-theme-border p-6 space-y-6">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
+            <div className="bg-theme-danger-soft border border-theme-danger/30 text-theme-danger px-4 py-3 rounded-lg text-sm">
               {error}
             </div>
           )}
 
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-navy-800 font-semibold text-sm mb-2">
-                عنوان العمل <span className="text-red-500">*</span>
+              <label className="block text-theme-text font-semibold text-sm mb-2">
+                عنوان العمل <span className="text-theme-danger">*</span>
               </label>
               <input
                 type="text"
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
                 required
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl bg-theme-input text-theme-text placeholder:text-theme-text-muted border border-theme-input-border focus:border-theme-primary focus:ring-2 focus:ring-theme-primary/20 outline-none transition-all"
               />
             </div>
             <div>
-              <label className="block text-navy-800 font-semibold text-sm mb-2">
+              <label className="block text-theme-text font-semibold text-sm mb-2">
                 الرابط (slug)
               </label>
               <input
@@ -163,7 +163,7 @@ const AdminPortfolioForm = () => {
                 value={form.slug}
                 onChange={(e) => setForm({ ...form, slug: e.target.value })}
                 placeholder="يتم إنشاؤه تلقائياً"
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl bg-theme-input text-theme-text placeholder:text-theme-text-muted border border-theme-input-border focus:border-theme-primary focus:ring-2 focus:ring-theme-primary/20 outline-none transition-all"
                 dir="ltr"
               />
             </div>
@@ -177,67 +177,67 @@ const AdminPortfolioForm = () => {
           />
 
           <div>
-            <label className="block text-navy-800 font-semibold text-sm mb-2">وصف مختصر</label>
+            <label className="block text-theme-text font-semibold text-sm mb-2">وصف مختصر</label>
             <textarea
               value={form.short_description}
               onChange={(e) => setForm({ ...form, short_description: e.target.value })}
               rows={2}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all resize-none"
+              className="w-full px-4 py-3 rounded-xl bg-theme-input text-theme-text placeholder:text-theme-text-muted border border-theme-input-border focus:border-theme-primary focus:ring-2 focus:ring-theme-primary/20 outline-none transition-all resize-none"
             />
           </div>
 
           <div>
-            <label className="block text-navy-800 font-semibold text-sm mb-2">التفاصيل</label>
+            <label className="block text-theme-text font-semibold text-sm mb-2">التفاصيل</label>
             <textarea
               value={form.details}
               onChange={(e) => setForm({ ...form, details: e.target.value })}
               rows={4}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all resize-none"
+              className="w-full px-4 py-3 rounded-xl bg-theme-input text-theme-text placeholder:text-theme-text-muted border border-theme-input-border focus:border-theme-primary focus:ring-2 focus:ring-theme-primary/20 outline-none transition-all resize-none"
             />
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-navy-800 font-semibold text-sm mb-2">التصنيف</label>
+              <label className="block text-theme-text font-semibold text-sm mb-2">التصنيف</label>
               <input
                 type="text"
                 value={form.category}
                 onChange={(e) => setForm({ ...form, category: e.target.value })}
                 placeholder="مثال: منشورات سوشيال ميديا"
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl bg-theme-input text-theme-text placeholder:text-theme-text-muted border border-theme-input-border focus:border-theme-primary focus:ring-2 focus:ring-theme-primary/20 outline-none transition-all"
               />
             </div>
             <div>
-              <label className="block text-navy-800 font-semibold text-sm mb-2">تاريخ المشروع</label>
+              <label className="block text-theme-text font-semibold text-sm mb-2">تاريخ المشروع</label>
               <input
                 type="date"
                 value={form.project_date}
                 onChange={(e) => setForm({ ...form, project_date: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl bg-theme-input text-theme-text placeholder:text-theme-text-muted border border-theme-input-border focus:border-theme-primary focus:ring-2 focus:ring-theme-primary/20 outline-none transition-all"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-navy-800 font-semibold text-sm mb-2">رابط خارجي</label>
+            <label className="block text-theme-text font-semibold text-sm mb-2">رابط خارجي</label>
             <input
               type="url"
               value={form.external_url}
               onChange={(e) => setForm({ ...form, external_url: e.target.value })}
               placeholder="https://..."
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all"
+              className="w-full px-4 py-3 rounded-xl bg-theme-input text-theme-text placeholder:text-theme-text-muted border border-theme-input-border focus:border-theme-primary focus:ring-2 focus:ring-theme-primary/20 outline-none transition-all"
               dir="ltr"
             />
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-navy-800 font-semibold text-sm mb-2">الترتيب</label>
+              <label className="block text-theme-text font-semibold text-sm mb-2">الترتيب</label>
               <input
                 type="number"
                 value={form.sort_order}
                 onChange={(e) => setForm({ ...form, sort_order: parseInt(e.target.value) || 0 })}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl bg-theme-input text-theme-text placeholder:text-theme-text-muted border border-theme-input-border focus:border-theme-primary focus:ring-2 focus:ring-theme-primary/20 outline-none transition-all"
               />
             </div>
             <div className="flex items-center gap-3 pt-8">
@@ -246,14 +246,14 @@ const AdminPortfolioForm = () => {
                 id="is_published"
                 checked={form.is_published}
                 onChange={(e) => setForm({ ...form, is_published: e.target.checked })}
-                className="w-5 h-5 rounded border-gray-300 text-teal-500 focus:ring-teal-500"
+                className="w-5 h-5 rounded border-theme-input-border text-theme-primary focus:ring-theme-primary"
               />
-              <label htmlFor="is_published" className="font-semibold text-navy-800">منشور</label>
+              <label htmlFor="is_published" className="font-semibold text-theme-text">منشور</label>
             </div>
           </div>
 
           <div className="flex gap-3 pt-4">
-            <Link to="/admin/portfolio" className="px-6 py-3 border border-gray-200 rounded-xl font-semibold text-gray-600 hover:bg-gray-50 transition-colors">
+            <Link to="/admin/portfolio" className="px-6 py-3 border border-theme-border rounded-xl font-semibold text-theme-text-secondary hover:bg-theme-muted transition-colors">
               إلغاء
             </Link>
             <button

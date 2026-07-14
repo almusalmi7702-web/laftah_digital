@@ -60,13 +60,13 @@ const AdminDashboard = () => {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-navy-800">لوحة التحكم</h1>
-        <p className="text-gray-500 mt-1">مرحباً بك في لوحة التحكم</p>
+        <h1 className="text-2xl font-bold text-theme-text">لوحة التحكم</h1>
+        <p className="text-theme-text-secondary mt-1">مرحباً بك في لوحة التحكم</p>
       </div>
 
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-4 border-theme-primary border-t-transparent rounded-full animate-spin" />
         </div>
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
@@ -74,46 +74,46 @@ const AdminDashboard = () => {
             <Link
               key={i}
               to={card.link}
-              className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group"
+              className="bg-theme-surface rounded-xl p-6 shadow-theme-card border border-theme-border hover:shadow-theme-elevated transition-all duration-300 hover:-translate-y-1 group"
             >
               <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${card.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
                 <card.icon className="w-6 h-6 text-white" />
               </div>
-              <p className="text-gray-500 text-sm mb-1">{card.label}</p>
-              <p className="text-3xl font-bold text-navy-800">{card.count}</p>
+              <p className="text-theme-text-secondary text-sm mb-1">{card.label}</p>
+              <p className="text-3xl font-bold text-theme-text">{card.count}</p>
             </Link>
           ))}
         </div>
       )}
 
       {/* Quick actions */}
-      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-        <h2 className="text-lg font-bold text-navy-800 mb-4">إضافة سريعة</h2>
+      <div className="bg-theme-surface rounded-xl p-6 shadow-theme-card border border-theme-border">
+        <h2 className="text-lg font-bold text-theme-text mb-4">إضافة سريعة</h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Link
             to="/admin/portfolio/new"
-            className="flex items-center gap-2 px-4 py-3 bg-teal-50 text-teal-700 rounded-lg hover:bg-teal-100 transition-colors font-medium text-sm"
+            className="flex items-center gap-2 px-4 py-3 bg-theme-primary-soft text-theme-primary rounded-lg hover:bg-theme-primary-soft transition-colors font-medium text-sm"
           >
             <Plus className="w-5 h-5" />
             عمل جديد
           </Link>
           <Link
             to="/admin/services/new"
-            className="flex items-center gap-2 px-4 py-3 bg-gray-100 text-navy-700 rounded-lg hover:bg-gray-200 transition-colors font-medium text-sm"
+            className="flex items-center gap-2 px-4 py-3 bg-theme-muted text-theme-text rounded-lg hover:bg-theme-elevated transition-colors font-medium text-sm"
           >
             <Plus className="w-5 h-5" />
             خدمة جديدة
           </Link>
           <Link
             to="/admin/pricing"
-            className="flex items-center gap-2 px-4 py-3 bg-teal-50 text-teal-700 rounded-lg hover:bg-teal-100 transition-colors font-medium text-sm"
+            className="flex items-center gap-2 px-4 py-3 bg-theme-primary-soft text-theme-primary rounded-lg hover:bg-theme-primary-soft transition-colors font-medium text-sm"
           >
             <Plus className="w-5 h-5" />
             باقة جديدة
           </Link>
           <Link
             to="/admin/faqs"
-            className="flex items-center gap-2 px-4 py-3 bg-gray-100 text-navy-700 rounded-lg hover:bg-gray-200 transition-colors font-medium text-sm"
+            className="flex items-center gap-2 px-4 py-3 bg-theme-muted text-theme-text rounded-lg hover:bg-theme-elevated transition-colors font-medium text-sm"
           >
             <Plus className="w-5 h-5" />
             سؤال جديد
@@ -127,7 +127,7 @@ const AdminDashboard = () => {
           href="/"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 text-teal-600 hover:text-teal-700 font-medium"
+          className="inline-flex items-center gap-2 text-theme-primary hover:text-theme-primary-hover font-medium"
         >
           <ArrowLeft className="w-4 h-4" />
           عرض الموقع

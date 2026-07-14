@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './hooks/useAuth';
+import { SiteSettingsProvider } from './hooks/useSiteSettings';
+import { ThemeProvider } from './theme/ThemeProvider';
 import Layout from './components/Layout';
 import Home from './pages/Home';
 import About from './pages/About';
@@ -26,56 +28,60 @@ import AdminSettings from './pages/admin/AdminSettings';
 
 function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <Routes>
-          {/* Public Routes */}
-          <Route element={<Layout />}>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/services" element={<Services />} />
-            <Route path="/services/:slug" element={<ServiceDetail />} />
-            <Route path="/pricing" element={<Pricing />} />
-            <Route path="/portfolio" element={<Portfolio />} />
-            <Route path="/portfolio/:slug" element={<PortfolioDetail />} />
-            <Route path="/free-audit" element={<FreeAudit />} />
-            <Route path="/faqs" element={<Faqs />} />
-            <Route path="/contact" element={<Contact />} />
-          </Route>
+    <ThemeProvider>
+      <SiteSettingsProvider>
+        <BrowserRouter>
+          <AuthProvider>
+            <Routes>
+              {/* Public Routes */}
+              <Route element={<Layout />}>
+                <Route path="/" element={<Home />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/services" element={<Services />} />
+                <Route path="/services/:slug" element={<ServiceDetail />} />
+                <Route path="/pricing" element={<Pricing />} />
+                <Route path="/portfolio" element={<Portfolio />} />
+                <Route path="/portfolio/:slug" element={<PortfolioDetail />} />
+                <Route path="/free-audit" element={<FreeAudit />} />
+                <Route path="/faqs" element={<Faqs />} />
+                <Route path="/contact" element={<Contact />} />
+              </Route>
 
-          {/* Admin Login */}
-          <Route path="/admin/login" element={<AdminLogin />} />
+              {/* Admin Login */}
+              <Route path="/admin/login" element={<AdminLogin />} />
 
-          {/* Admin Protected Routes */}
-          <Route
-            path="/admin"
-            element={
-              <AdminProtectedRoute>
-                <AdminLayout />
-              </AdminProtectedRoute>
-            }
-          >
-            <Route index element={<AdminDashboard />} />
-            {/* Portfolio */}
-            <Route path="portfolio" element={<AdminPortfolio />} />
-            <Route path="portfolio/new" element={<AdminPortfolioForm />} />
-            <Route path="portfolio/:id/edit" element={<AdminPortfolioForm />} />
-            {/* Services */}
-            <Route path="services" element={<AdminServices />} />
-            <Route path="services/new" element={<AdminServicesForm />} />
-            <Route path="services/:id/edit" element={<AdminServicesForm />} />
-            {/* Pricing */}
-            <Route path="pricing" element={<AdminPricing />} />
-            <Route path="pricing/new" element={<AdminPricingForm />} />
-            <Route path="pricing/:id/edit" element={<AdminPricingForm />} />
-            {/* FAQs */}
-            <Route path="faqs" element={<AdminFaqs />} />
-            {/* Settings */}
-            <Route path="settings" element={<AdminSettings />} />
-          </Route>
-        </Routes>
-      </AuthProvider>
-    </BrowserRouter>
+              {/* Admin Protected Routes */}
+              <Route
+                path="/admin"
+                element={
+                  <AdminProtectedRoute>
+                    <AdminLayout />
+                  </AdminProtectedRoute>
+                }
+              >
+                <Route index element={<AdminDashboard />} />
+                {/* Portfolio */}
+                <Route path="portfolio" element={<AdminPortfolio />} />
+                <Route path="portfolio/new" element={<AdminPortfolioForm />} />
+                <Route path="portfolio/:id/edit" element={<AdminPortfolioForm />} />
+                {/* Services */}
+                <Route path="services" element={<AdminServices />} />
+                <Route path="services/new" element={<AdminServicesForm />} />
+                <Route path="services/:id/edit" element={<AdminServicesForm />} />
+                {/* Pricing */}
+                <Route path="pricing" element={<AdminPricing />} />
+                <Route path="pricing/new" element={<AdminPricingForm />} />
+                <Route path="pricing/:id/edit" element={<AdminPricingForm />} />
+                {/* FAQs */}
+                <Route path="faqs" element={<AdminFaqs />} />
+                {/* Settings */}
+                <Route path="settings" element={<AdminSettings />} />
+              </Route>
+            </Routes>
+          </AuthProvider>
+        </BrowserRouter>
+      </SiteSettingsProvider>
+    </ThemeProvider>
   );
 }
 

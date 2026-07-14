@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  darkMode: 'class',
   theme: {
     extend: {
       fontFamily: {
@@ -8,6 +9,29 @@ export default {
         cairo: ['Cairo', 'sans-serif'],
       },
       colors: {
+        // Semantic theme colors bound to CSS variables (RGB triplets).
+        'theme-page': 'rgb(var(--color-page) / <alpha-value>)',
+        'theme-surface': 'rgb(var(--color-surface) / <alpha-value>)',
+        'theme-elevated': 'rgb(var(--color-surface-elevated) / <alpha-value>)',
+        'theme-muted': 'rgb(var(--color-surface-muted) / <alpha-value>)',
+        'theme-text': 'rgb(var(--color-text-primary) / <alpha-value>)',
+        'theme-text-secondary': 'rgb(var(--color-text-secondary) / <alpha-value>)',
+        'theme-text-muted': 'rgb(var(--color-text-muted) / <alpha-value>)',
+        'theme-border': 'rgb(var(--color-border) / <alpha-value>)',
+        'theme-border-strong': 'rgb(var(--color-border-strong) / <alpha-value>)',
+        'theme-primary': 'rgb(var(--color-primary) / <alpha-value>)',
+        'theme-primary-hover': 'rgb(var(--color-primary-hover) / <alpha-value>)',
+        'theme-primary-soft': 'rgb(var(--color-primary-soft) / <alpha-value>)',
+        'theme-nav': 'rgb(var(--color-nav) / <alpha-value>)',
+        'theme-footer': 'rgb(var(--color-footer) / <alpha-value>)',
+        'theme-input': 'rgb(var(--color-input) / <alpha-value>)',
+        'theme-input-border': 'rgb(var(--color-input-border) / <alpha-value>)',
+        'theme-success': 'rgb(var(--color-success) / <alpha-value>)',
+        'theme-success-soft': 'rgb(var(--color-success-soft) / <alpha-value>)',
+        'theme-warning': 'rgb(var(--color-warning) / <alpha-value>)',
+        'theme-warning-soft': 'rgb(var(--color-warning-soft) / <alpha-value>)',
+        'theme-danger': 'rgb(var(--color-danger) / <alpha-value>)',
+        'theme-danger-soft': 'rgb(var(--color-danger-soft) / <alpha-value>)',
         teal: {
           50: '#f0fdfa',
           100: '#ccfbf1',
@@ -27,6 +51,10 @@ export default {
           800: '#152a45',
           900: '#0f1f33',
         },
+      },
+      boxShadow: {
+        'theme-card': 'var(--shadow-card)',
+        'theme-elevated': 'var(--shadow-elevated)',
       },
       animation: {
         'fade-in-up': 'fadeInUp 0.6s ease-out forwards',

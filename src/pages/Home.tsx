@@ -4,9 +4,10 @@ import { ArrowLeft, Sparkles, MessageCircle, Check, Eye, Target } from 'lucide-r
 import { useInView } from '../hooks/useInView';
 import {
   hero, values, whyUs, servicesList, packages,
-  getWhatsAppLink, messages,
+  messages,
 } from '../data/content';
 import { getServices, getPricingPlans, getPortfolioItems } from '../services/dataService';
+import { useSiteSettings } from '../hooks/useSiteSettings';
 import FAQSection from '../components/FAQSection';
 import ImagePlaceholder from '../components/ImagePlaceholder';
 import { CardSkeleton, PricingSkeleton, PortfolioSkeleton } from '../components/Skeleton';
@@ -17,7 +18,7 @@ const Hero = () => {
   const { ref, isInView } = useInView(0.05);
 
   return (
-    <section className="min-h-screen pt-20 bg-gradient-to-bl from-gray-50 via-white to-teal-50/30 relative overflow-hidden">
+    <section className="min-h-screen pt-20 bg-gradient-to-bl from-theme-muted via-theme-page to-theme-primary-soft relative overflow-hidden">
       {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -left-40 w-96 h-96 bg-teal-100/40 rounded-full blur-3xl" />
@@ -30,16 +31,16 @@ const Hero = () => {
           {/* Content */}
           <div className="order-2 lg:order-2 text-right">
             <div className={`transition-all duration-700 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-              <span className="inline-block bg-teal-50 text-teal-700 px-4 py-2 rounded-full text-sm font-semibold mb-6">
+              <span className="inline-block bg-theme-primary-soft text-theme-primary px-4 py-2 rounded-full text-sm font-semibold mb-6">
                 {hero.badge}
               </span>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-navy-800 leading-[1.35] mb-8 max-w-2xl">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-theme-text leading-[1.35] mb-8 max-w-2xl">
                 نحوّل مشروعك إلى
                 <span className="block mt-1 bg-gradient-to-l from-teal-500 to-teal-600 bg-clip-text text-transparent leading-[1.35]">
                   حضور بصري يلفت الانتباه
                 </span>
               </h1>
-              <p className="text-gray-600 text-base sm:text-lg leading-[1.9] mb-10 max-w-xl">
+              <p className="text-theme-text-secondary text-base sm:text-lg leading-[1.9] mb-10 max-w-xl">
                 {hero.description}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-end">
@@ -52,7 +53,7 @@ const Hero = () => {
                 </Link>
                 <Link
                   to="/free-audit"
-                  className="inline-flex items-center justify-center gap-2 bg-white border-2 border-teal-500 text-teal-600 px-8 py-4 rounded-full font-bold text-base hover:bg-teal-50 transition-all duration-300 hover:-translate-y-1"
+                  className="inline-flex items-center justify-center gap-2 bg-theme-surface border-2 border-teal-500 text-teal-600 px-8 py-4 rounded-full font-bold text-base hover:bg-theme-primary-soft transition-all duration-300 hover:-translate-y-1"
                 >
                   <Eye className="w-5 h-5" />
                   {hero.ctaAudit}
@@ -81,12 +82,12 @@ const Hero = () => {
               </div>
 
               {/* Identity Card */}
-              <div className="absolute -top-8 -right-1 sm:-top-7 sm:-right-4 bg-white rounded-2xl p-3 sm:p-4 shadow-xl border border-gray-100">
+              <div className="absolute -top-8 -right-1 sm:-top-7 sm:-right-4 bg-theme-surface rounded-2xl p-3 sm:p-4 shadow-xl border border-theme-border">
                 <div className="flex items-center gap-2 sm:gap-3">
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-teal-50 rounded-lg flex items-center justify-center">
-                    <Target className="w-5 h-5 text-teal-600" />
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-theme-primary-soft rounded-lg flex items-center justify-center">
+                    <Target className="w-5 h-5 text-theme-primary" />
                   </div>
-                  <span className="text-xs sm:text-sm font-bold text-navy-800">هوية بصرية متناسقة</span>
+                  <span className="text-xs sm:text-sm font-bold text-theme-text">هوية بصرية متناسقة</span>
                 </div>
               </div>
             </div>
@@ -127,10 +128,10 @@ const WhyUsPreview = () => {
   const icons = [Eye, Target, Sparkles];
 
   return (
-    <section className="py-20 bg-white">
+    <section className="py-20 bg-theme-page">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" ref={ref}>
         <div className="text-center mb-14">
-          <h2 className={`text-3xl md:text-4xl font-black text-navy-800 mb-4 transition-all duration-700 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <h2 className={`text-3xl md:text-4xl font-black text-theme-text mb-4 transition-all duration-700 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             {whyUs.title}
           </h2>
         </div>
@@ -142,14 +143,14 @@ const WhyUsPreview = () => {
             return (
               <div
                 key={i}
-                className={`group bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl border border-gray-100 hover:border-teal-200 transition-all duration-500 hover:-translate-y-2 text-center ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+                className={`group bg-theme-surface rounded-2xl p-8 shadow-theme-card hover:shadow-theme-elevated border border-theme-border hover:border-theme-primary transition-all duration-500 hover:-translate-y-2 text-center ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
                 style={{ transitionDelay: `${i * 80}ms` }}
               >
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                   <Icon className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-lg font-bold text-navy-800 mb-3">{card.title}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">{card.description}</p>
+                <h3 className="text-lg font-bold text-theme-text mb-3">{card.title}</h3>
+                <p className="text-theme-text-secondary text-sm leading-relaxed">{card.description}</p>
               </div>
             );
           })}
@@ -195,10 +196,10 @@ const ServicesPreview = () => {
   const useSupabase = services.length > 0;
 
   return (
-    <section className="py-20 bg-gray-50">
+    <section className="py-20 bg-theme-muted">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" ref={ref}>
         <div className="text-center mb-14">
-          <h2 className={`text-3xl md:text-4xl font-black text-navy-800 mb-4 transition-all duration-700 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <h2 className={`text-3xl md:text-4xl font-black text-theme-text mb-4 transition-all duration-700 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             خدماتنا
           </h2>
         </div>
@@ -215,11 +216,11 @@ const ServicesPreview = () => {
               <Link
                 key={useSupabase ? (s as Service).id : i}
                 to={useSupabase ? `/services/${(s as Service).slug}` : '/services'}
-                className={`group bg-white rounded-xl p-6 shadow-sm hover:shadow-lg border border-gray-100 hover:border-teal-200 transition-all duration-300 text-center ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+                className={`group bg-theme-surface rounded-xl p-6 shadow-theme-card hover:shadow-theme-elevated border border-theme-border hover:border-theme-primary transition-all duration-300 text-center ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
                 style={{ transitionDelay: `${i * 50}ms` }}
               >
                 {useSupabase && (s as Service).thumbnail_url ? (
-                  <div className="w-full aspect-video rounded-lg overflow-hidden mb-4 bg-gray-100">
+                  <div className="w-full aspect-video rounded-lg overflow-hidden mb-4 bg-theme-muted">
                     <img
                       src={(s as Service).thumbnail_url!}
                       alt={s.title}
@@ -227,13 +228,13 @@ const ServicesPreview = () => {
                     />
                   </div>
                 ) : (
-                  <div className="w-full aspect-video rounded-lg overflow-hidden mb-4 bg-gray-100">
+                  <div className="w-full aspect-video rounded-lg overflow-hidden mb-4 bg-theme-muted">
                     <ImagePlaceholder variant="full" />
                   </div>
                 )}
 
-                <h3 className="text-sm font-bold text-navy-800 mb-2">{s.title}</h3>
-                <p className="text-xs text-gray-500 leading-relaxed line-clamp-2">
+                <h3 className="text-sm font-bold text-theme-text mb-2">{s.title}</h3>
+                <p className="text-xs text-theme-text-secondary leading-relaxed line-clamp-2">
                   {useSupabase ? ((s as Service).short_description || (s as Service).details || '') : (s as typeof servicesList[0]).description}
                 </p>
               </Link>
@@ -292,10 +293,10 @@ const PortfolioPreview = () => {
   }
 
   return (
-    <section className="py-20 bg-gray-50">
+    <section className="py-20 bg-theme-muted">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" ref={ref}>
         <div className="text-center mb-14">
-          <h2 className={`text-3xl md:text-4xl font-black text-navy-800 mb-4 transition-all duration-700 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <h2 className={`text-3xl md:text-4xl font-black text-theme-text mb-4 transition-all duration-700 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             أعمالنا
           </h2>
         </div>
@@ -313,10 +314,10 @@ const PortfolioPreview = () => {
                 <Link
                   key={item.id}
                   to={`/portfolio/${item.slug}`}
-                  className={`group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+                  className={`group bg-theme-surface rounded-2xl shadow-theme-card border border-theme-border overflow-hidden hover:shadow-theme-elevated transition-all duration-300 hover:-translate-y-1 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
                   style={{ transitionDelay: `${i * 50}ms` }}
                 >
-                  <div className="aspect-video bg-gray-100 overflow-hidden">
+                  <div className="aspect-video bg-theme-muted overflow-hidden">
                     {item.thumbnail_url ? (
                       <img
                         src={item.thumbnail_url}
@@ -330,11 +331,11 @@ const PortfolioPreview = () => {
 
                   <div className="p-4 text-right">
                     {item.category && (
-                      <span className="inline-block bg-teal-50 text-teal-700 text-xs px-2 py-1 rounded mb-2">
+                      <span className="inline-block bg-theme-primary-soft text-theme-primary text-xs px-2 py-1 rounded mb-2">
                         {item.category}
                       </span>
                     )}
-                    <h3 className="text-sm font-bold text-navy-800 line-clamp-1">{item.title}</h3>
+                    <h3 className="text-sm font-bold text-theme-text line-clamp-1">{item.title}</h3>
                   </div>
                 </Link>
               ))}
@@ -343,7 +344,7 @@ const PortfolioPreview = () => {
             <div className="text-center">
               <Link
                 to="/portfolio"
-                className="inline-flex items-center gap-2 border-2 border-teal-500 text-teal-600 px-8 py-3 rounded-full font-bold text-sm hover:bg-teal-50 transition-all duration-300"
+                className="inline-flex items-center gap-2 border-2 border-teal-500 text-teal-600 px-8 py-3 rounded-full font-bold text-sm hover:bg-theme-primary-soft transition-all duration-300"
               >
                 عرض جميع الأعمال
                 <ArrowLeft className="w-4 h-4" />
@@ -358,6 +359,7 @@ const PortfolioPreview = () => {
 
 // ── Packages Preview ──────────────────────────────────────────────────────────
 const PackagesPreview = () => {
+  const { siteSettings, getWhatsAppLink } = useSiteSettings();
   const { ref, isInView } = useInView();
   const [plans, setPlans] = useState<PricingPlan[]>([]);
   const [loading, setLoading] = useState(true);
@@ -392,13 +394,13 @@ const PackagesPreview = () => {
   const preview = useSupabase ? plans.slice(0, 3) : packages;
 
   return (
-    <section className="py-20 bg-white">
+    <section className="py-20 bg-theme-page">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" ref={ref}>
         <div className="text-center mb-14">
-          <h2 className={`text-3xl md:text-4xl font-black text-navy-800 mb-4 transition-all duration-700 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <h2 className={`text-3xl md:text-4xl font-black text-theme-text mb-4 transition-all duration-700 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             باقاتنا الشهرية
           </h2>
-          <p className={`text-gray-600 max-w-xl mx-auto transition-all duration-700 delay-100 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <p className={`text-theme-text-secondary max-w-xl mx-auto transition-all duration-700 delay-100 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             اختر الباقة المناسبة لحضور مشروعك على السوشيال ميديا.
           </p>
         </div>
@@ -427,7 +429,7 @@ const PackagesPreview = () => {
                   className={`relative rounded-2xl p-8 transition-all duration-500 ${
                     featured
                       ? 'bg-gradient-to-b from-teal-500 to-teal-600 text-white shadow-2xl shadow-teal-500/30 scale-105 z-10'
-                      : 'bg-white border border-gray-200 hover:border-teal-200 hover:shadow-xl'
+                      : 'bg-theme-surface border border-theme-border hover:border-theme-primary hover:shadow-theme-elevated'
                   } ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
                   style={{ transitionDelay: `${i * 80}ms` }}
                 >
@@ -437,43 +439,45 @@ const PackagesPreview = () => {
                     </span>
                   )}
 
-                  <h3 className={`text-xl font-bold mb-2 text-center ${featured ? 'text-white' : 'text-navy-800'}`}>
+                  <h3 className={`text-xl font-bold mb-2 text-center ${featured ? 'text-white' : 'text-theme-text'}`}>
                     {name}
                   </h3>
 
                   <div className="flex items-baseline justify-center gap-1 mb-6">
-                    <span className={`text-sm ${featured ? 'text-teal-100' : 'text-gray-500'}`}>ر.س</span>
-                    <span className={`text-4xl font-black ${featured ? 'text-white' : 'text-teal-600'}`}>{price}</span>
+                    <span className={`text-sm ${featured ? 'text-teal-100' : 'text-theme-text-muted'}`}>ر.س</span>
+                    <span className={`text-4xl font-black ${featured ? 'text-white' : 'text-theme-primary'}`}>{price}</span>
                   </div>
 
                   <ul className="space-y-3 mb-8">
                     {features.map((f, fi) => (
-                      <li key={fi} className={`flex items-center gap-3 text-sm ${featured ? 'text-teal-50' : 'text-gray-600'}`}>
-                        <Check className={`w-4 h-4 flex-shrink-0 ${featured ? 'text-teal-200' : 'text-teal-500'}`} />
+                      <li key={fi} className={`flex items-center gap-3 text-sm ${featured ? 'text-teal-50' : 'text-theme-text-secondary'}`}>
+                        <Check className={`w-4 h-4 flex-shrink-0 ${featured ? 'text-teal-200' : 'text-theme-primary'}`} />
                         {f}
                       </li>
                     ))}
                   </ul>
 
                   {description && (
-                    <p className={`text-sm mb-6 text-center ${featured ? 'text-teal-100' : 'text-gray-500'}`}>
+                    <p className={`text-sm mb-6 text-center ${featured ? 'text-teal-100' : 'text-theme-text-muted'}`}>
                       {description}
                     </p>
                   )}
 
-                  <a
-                    href={getWhatsAppLink(message)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full font-bold text-sm transition-all duration-300 hover:-translate-y-1 ${
-                      featured
-                        ? 'bg-white text-teal-600 hover:shadow-lg'
-                        : 'bg-gradient-to-l from-teal-500 to-teal-600 text-white hover:shadow-lg hover:shadow-teal-500/30'
-                    }`}
-                  >
-                    أريد {name}
-                    <ArrowLeft className="w-4 h-4" />
-                  </a>
+                  {siteSettings.whatsapp_enabled && (
+                    <a
+                      href={getWhatsAppLink(message)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full font-bold text-sm transition-all duration-300 hover:-translate-y-1 ${
+                        featured
+                          ? 'bg-white text-teal-600 hover:shadow-lg'
+                          : 'bg-gradient-to-l from-teal-500 to-teal-600 text-white hover:shadow-lg hover:shadow-teal-500/30'
+                      }`}
+                    >
+                      أريد {name}
+                      <ArrowLeft className="w-4 h-4" />
+                    </a>
+                  )}
                 </div>
               );
             })}
@@ -483,7 +487,7 @@ const PackagesPreview = () => {
         <div className="text-center mt-10">
           <Link
             to="/pricing"
-            className="inline-flex items-center gap-2 border-2 border-teal-500 text-teal-600 px-8 py-3 rounded-full font-bold text-sm hover:bg-teal-50 transition-all duration-300"
+            className="inline-flex items-center gap-2 border-2 border-teal-500 text-teal-600 px-8 py-3 rounded-full font-bold text-sm hover:bg-theme-primary-soft transition-all duration-300"
           >
             تفاصيل الباقات
             <ArrowLeft className="w-4 h-4" />
@@ -496,6 +500,7 @@ const PackagesPreview = () => {
 
 // ── Final CTA ─────────────────────────────────────────────────────────────────
 const FinalCTA = () => {
+  const { siteSettings, getWhatsAppLink } = useSiteSettings();
   const { ref, isInView } = useInView();
 
   return (
@@ -522,15 +527,17 @@ const FinalCTA = () => {
             احصل على تحليل مجاني
           </Link>
 
-          <a
-            href={getWhatsAppLink(messages.general)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 bg-transparent border-2 border-white text-white px-8 py-4 rounded-full font-bold text-base hover:bg-white/10 transition-all duration-300 hover:-translate-y-1"
-          >
-            <MessageCircle className="w-5 h-5" />
-            تواصل معنا
-          </a>
+          {siteSettings.whatsapp_enabled && (
+            <a
+              href={getWhatsAppLink(messages.general)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 bg-transparent border-2 border-white text-white px-8 py-4 rounded-full font-bold text-base hover:bg-white/10 transition-all duration-300 hover:-translate-y-1"
+            >
+              <MessageCircle className="w-5 h-5" />
+              تواصل معنا
+            </a>
+          )}
         </div>
       </div>
     </section>
