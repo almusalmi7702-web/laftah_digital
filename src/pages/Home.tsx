@@ -18,7 +18,7 @@ const Hero = () => {
   const { ref, isInView } = useInView(0.05);
 
   return (
-    <section className="min-h-screen pt-20 bg-gradient-to-bl from-theme-muted via-theme-page to-theme-primary-soft relative overflow-hidden">
+    <section className="pt-20 bg-gradient-to-bl from-theme-muted via-theme-page to-theme-primary-soft relative overflow-hidden">
       {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -left-40 w-96 h-96 bg-teal-100/40 rounded-full blur-3xl" />
