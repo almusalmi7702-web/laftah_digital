@@ -93,8 +93,8 @@ const AdminServices = () => {
                       <tr key={item.id} className="border-b border-theme-border hover:bg-theme-muted transition-colors">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-4">
-                            {item.thumbnail_url ? (
-                              <img src={item.thumbnail_url} alt="" className="w-12 h-12 rounded-lg object-cover" />
+                            {item.images?.[0] ? (
+                              <img src={item.images[0]} alt={item.title} className="w-12 h-12 rounded-lg object-cover" />
                             ) : (
                               <div className="w-12 h-12 rounded-lg overflow-hidden">
                                 <ImagePlaceholder />
@@ -131,8 +131,8 @@ const AdminServices = () => {
               {items.map((item) => (
                 <div key={item.id} className="bg-theme-surface rounded-xl shadow-sm border border-theme-border p-4">
                   <div className="flex items-start gap-3">
-                    {item.thumbnail_url ? (
-                      <img src={item.thumbnail_url} alt="" className="w-14 h-14 rounded-lg object-cover flex-shrink-0" />
+                    {item.images?.[0] ? (
+                      <img src={item.images[0]} alt={item.title} className="w-14 h-14 rounded-lg object-cover flex-shrink-0" />
                     ) : (
                       <div className="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
                         <ImagePlaceholder />
