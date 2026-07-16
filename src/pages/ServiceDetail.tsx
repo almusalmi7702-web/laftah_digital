@@ -4,7 +4,7 @@ import { ArrowLeft, Check, MessageCircle } from 'lucide-react';
 import { getServiceBySlug } from '../services/dataService';
 import { servicesList as staticServices } from '../data/content';
 import { useSiteSettings } from '../hooks/useSiteSettings';
-import ImagePlaceholder from '../components/ImagePlaceholder';
+import ServiceImageSlider from '../components/ServiceImageSlider';
 import type { Service } from '../types/database';
 
 const ServiceDetail = () => {
@@ -44,7 +44,7 @@ const ServiceDetail = () => {
     slug: slug || '',
     short_description: staticService.description,
     details: null,
-    thumbnail_url: null,
+    images: [],
     price: null,
     features: [],
     is_published: true,
@@ -79,13 +79,12 @@ const ServiceDetail = () => {
         </Link>
 
         <div className="bg-theme-surface rounded-2xl shadow-theme-card border border-theme-border overflow-hidden">
-          <div className="aspect-video w-full bg-theme-muted">
-            {displayService.thumbnail_url ? (
-              <img src={displayService.thumbnail_url} alt={displayService.title} className="w-full h-full object-cover" />
-            ) : (
-              <ImagePlaceholder variant="full" />
-            )}
-          </div>
+<div className="aspect-video w-full bg-theme-muted">
+  <ServiceImageSlider
+    images={displayService.images}
+    alt={displayService.title}
+  />
+</div>
 
           <div className="p-8">
             <h1 className="text-2xl md:text-3xl font-bold text-theme-text mb-4">{displayService.title}</h1>
