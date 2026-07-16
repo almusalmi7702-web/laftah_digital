@@ -144,9 +144,9 @@ const ServicesList = () => {
                 style={{ transitionDelay: `${i * 50}ms` }}
               >
                 <div className="aspect-video bg-theme-muted overflow-hidden">
-                  {s.thumbnail_url ? (
+                  {s.s.images[0] ? (
                     <img
-                      src={s.thumbnail_url}
+                      src={s.images[0]}
                       alt={s.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
