@@ -8,7 +8,7 @@ import { useInView } from '../hooks/useInView';
 import { getServices } from '../services/dataService';
 import { servicesList, messages } from '../data/content';
 import { useSiteSettings } from '../hooks/useSiteSettings';
-import ImagePlaceholder from '../components/ImagePlaceholder';
+import ServiceImageSlider from '../components/ServiceImageSlider';
 import type { Service } from '../types/database';
 
 const staticIcons = [Instagram, ShoppingBag, Image, Palette, FileText, Presentation, Calendar];
@@ -143,17 +143,13 @@ const ServicesList = () => {
                 className={`group bg-theme-surface rounded-2xl shadow-theme-card hover:shadow-theme-elevated border border-theme-border hover:border-theme-primary text-right transition-all duration-300 overflow-hidden ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
                 style={{ transitionDelay: `${i * 50}ms` }}
               >
-                <div className="aspect-video bg-theme-muted overflow-hidden">
-                  {s.images[0] ? (
-                    <img
-                      src={s.images[0]}
-                      alt={s.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  ) : (
-                    <ImagePlaceholder variant="full" />
-                  )}
-                </div>
+<div className="aspect-video bg-theme-muted overflow-hidden">
+  <ServiceImageSlider
+    images={s.images}
+    alt={s.title}
+    imageClassName="group-hover:scale-105 transition-transform duration-500"
+  />
+</div>
 
                 <div className="p-6">
                   <h3 className="text-base font-bold text-theme-text mb-2">{s.title}</h3>
