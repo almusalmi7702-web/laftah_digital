@@ -237,7 +237,7 @@ export const getServices = async (): Promise<Service[]> => {
     const { data, error } = await withTimeout<Service[]>(
       supabase
         .from('services')
-        .select('id,title,slug,short_description,thumbnail_url,images,price,sort_order,created_at')
+        .select('id,title,slug,short_description,images,price,sort_order,created_at')
         .eq('is_published', true)
         .order('sort_order', { ascending: true })
         .order('created_at', { ascending: false })
