@@ -144,7 +144,7 @@ const ServicesList = () => {
                 style={{ transitionDelay: `${i * 50}ms` }}
               >
                 <div className="aspect-video bg-theme-muted overflow-hidden">
-                  {s.s.images[0] ? (
+                  {s.images[0] ? (
                     <img
                       src={s.images[0]}
                       alt={s.title}
