@@ -48,6 +48,7 @@ export interface Service {
   short_description: string | null;
   details: string | null;
   thumbnail_url: string | null;
+  images: string[];
   price: string | null;
   features: string[];
   is_published: boolean;
