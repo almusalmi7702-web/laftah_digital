@@ -219,10 +219,10 @@ const ServicesPreview = () => {
                 className={`group bg-theme-surface rounded-xl p-6 shadow-theme-card hover:shadow-theme-elevated border border-theme-border hover:border-theme-primary transition-all duration-300 text-center ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
                 style={{ transitionDelay: `${i * 50}ms` }}
               >
-                {useSupabase && (s as Service).thumbnail_url ? (
+                {useSupabase && (s as Service).images?.[0] ? (
                   <div className="w-full aspect-video rounded-lg overflow-hidden mb-4 bg-theme-muted">
                     <img
-                      src={(s as Service).thumbnail_url!}
+                      src={(s as Service).images[0]}
                       alt={s.title}
                       className="w-full h-full object-cover"
                     />
