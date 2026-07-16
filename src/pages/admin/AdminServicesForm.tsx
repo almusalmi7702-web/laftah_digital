@@ -5,7 +5,7 @@ import {
   getAllServices, createService, updateService
 } from '../../services/dataService';
 import { useToast } from '../../hooks/useToast';
-import ImageUpload from '../../components/admin/ImageUpload';
+import MultiImageUpload from '../../components/admin/MultiImageUpload';
 import { generateSlug, sanitizeSlug } from '../../utils/slug';
 import type { ServiceInsert } from '../../types/database';
 
@@ -184,12 +184,17 @@ const AdminServicesForm = () => {
             </div>
           </div>
 
-          <ImageUpload
-            bucket="services"
-            value={form.thumbnail_url}
-            onChange={(url) => setForm({ ...form, thumbnail_url: url })}
-            label="صورة الخدمة (موصى به: 1200×675)"
-          />
+<MultiImageUpload
+  bucket="services"
+  value={form.images}
+  onChange={(images) =>
+    setForm({
+      ...form,
+      images,
+    })
+  }
+  label="صور الخدمة (موصى به: 1200×675)"
+/>
 
           <div>
             <label className="block text-theme-text font-semibold text-sm mb-2">وصف مختصر</label>
