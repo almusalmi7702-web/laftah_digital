@@ -10,6 +10,7 @@ import { getServices, getPricingPlans, getPortfolioItems } from '../services/dat
 import { useSiteSettings } from '../hooks/useSiteSettings';
 import FAQSection from '../components/FAQSection';
 import ImagePlaceholder from '../components/ImagePlaceholder';
+import ServiceImageSlider from '../components/ServiceImageSlider';
 import { CardSkeleton, PricingSkeleton, PortfolioSkeleton } from '../components/Skeleton';
 import type { Service, PricingPlan, PortfolioItem } from '../types/database';
 
@@ -219,19 +220,19 @@ const ServicesPreview = () => {
                 className={`group bg-theme-surface rounded-xl p-6 shadow-theme-card hover:shadow-theme-elevated border border-theme-border hover:border-theme-primary transition-all duration-300 text-center ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
                 style={{ transitionDelay: `${i * 50}ms` }}
               >
-                {useSupabase && (s as Service).images?.[0] ? (
-                  <div className="w-full aspect-video rounded-lg overflow-hidden mb-4 bg-theme-muted">
-                    <img
-                      src={(s as Service).images[0]}
-                      alt={s.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                ) : (
-                  <div className="w-full aspect-video rounded-lg overflow-hidden mb-4 bg-theme-muted">
-                    <ImagePlaceholder variant="full" />
-                  </div>
-                )}
+{useSupabase ? (
+  <div className="w-full aspect-video rounded-lg overflow-hidden mb-4 bg-theme-muted">
+    <ServiceImageSlider
+      images={(s as Service).images}
+      alt={s.title}
+      imageClassName="group-hover:scale-105 transition-transform duration-500"
+    />
+  </div>
+) : (
+  <div className="w-full aspect-video rounded-lg overflow-hidden mb-4 bg-theme-muted">
+    <ImagePlaceholder variant="full" />
+  </div>
+)}
 
                 <h3 className="text-sm font-bold text-theme-text mb-2">{s.title}</h3>
                 <p className="text-xs text-theme-text-secondary leading-relaxed line-clamp-2">
