@@ -22,7 +22,6 @@ const AdminServicesForm = () => {
     slug: '',
     short_description: '',
     details: '',
-    thumbnail_url: '' as string | null,
     images: [] as string[],
     price: '',
     features: [] as string[],
@@ -48,12 +47,7 @@ const AdminServicesForm = () => {
           slug: item.slug || '',
           short_description: item.short_description || '',
           details: item.details || '',
-          thumbnail_url: item.thumbnail_url || null,
-          images: item.images?.length
-  ? item.images
-  : item.thumbnail_url
-    ? [item.thumbnail_url]
-    : [],
+images: item.images ?? [],
           price: item.price || '',
           features: item.features || [],
           is_published: item.is_published ?? true,
@@ -96,7 +90,6 @@ const AdminServicesForm = () => {
         slug: finalSlug,
         short_description: form.short_description.trim() || null,
         details: form.details.trim() || null,
-        thumbnail_url: form.thumbnail_url?.trim() || null,
         images: form.images,
         price: form.price.trim() || null,
         features: form.features,
