@@ -1,10 +1,12 @@
 import {
+  useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
   type MouseEvent,
   type TouchEvent,
+  type TransitionEvent,
 } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import ImagePlaceholder from './ImagePlaceholder';
@@ -15,6 +17,10 @@ interface ServiceImageSliderProps {
   className?: string;
   imageClassName?: string;
 }
+
+const AUTO_PLAY_DELAY = 4000;
+const SLIDE_DURATION = 480;
+const MOBILE_CONTROLS_HIDE_DELAY = 600;
 
 const ServiceImageSlider = ({
   images,
@@ -37,6 +43,11 @@ const ServiceImageSlider = ({
   const [activeIndex, setActiveIndex] = useState(0);
   const [failedImages, setFailedImages] = useState<string[]>([]);
   const [controlsVisible, setControlsVisible] = useState(false);
+  const [trackIndex, setTrackIndex] = useState(
+    normalizedImages.length > 1 ? 1 : 0,
+  );
+  const [transitionEnabled, setTransitionEnabled] = useState(true);
+  const [isSliding, setIsSliding] = useState(false);
 
   const touchStartRef = useRef<{
     x: number;
@@ -45,6 +56,7 @@ const ServiceImageSlider = ({
 
   const didSwipeRef = useRef(false);
   const hideControlsTimeoutRef = useRef<number | null>(null);
+  const transitionFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
     setActiveIndex(0);
@@ -56,6 +68,10 @@ const ServiceImageSlider = ({
       if (hideControlsTimeoutRef.current !== null) {
         window.clearTimeout(hideControlsTimeoutRef.current);
       }
+
+      if (transitionFrameRef.current !== null) {
+        window.cancelAnimationFrame(transitionFrameRef.current);
+      }
     };
   }, []);
 
@@ -63,34 +79,33 @@ const ServiceImageSlider = ({
     (image) => !failedImages.includes(image),
   );
 
+  const visibleImagesKey = visibleImages.join('|');
+  const hasMultipleImages = visibleImages.length > 1;
+
   const safeIndex = Math.min(
     activeIndex,
     Math.max(visibleImages.length - 1, 0),
   );
 
   const currentImage = visibleImages[safeIndex];
-  const hasMultipleImages = visibleImages.length > 1;
 
   useEffect(() => {
-    if (!hasMultipleImages) return;
+    setActiveIndex(0);
+    setTrackIndex(visibleImages.length > 1 ? 1 : 0);
+    setTransitionEnabled(false);
+    setIsSliding(false);
 
-    const timeoutId = window.setTimeout(() => {
-      setActiveIndex((current) => {
-        const currentIndex = Math.min(
-          current,
-          visibleImages.length - 1,
-        );
+    if (transitionFrameRef.current !== null) {
+      window.cancelAnimationFrame(transitionFrameRef.current);
+    }
 
-        return currentIndex >= visibleImages.length - 1
-          ? 0
-          : currentIndex + 1;
+    transitionFrameRef.current = window.requestAnimationFrame(() => {
+      transitionFrameRef.current = window.requestAnimationFrame(() => {
+        setTransitionEnabled(true);
+        transitionFrameRef.current = null;
       });
-    }, 4000);
-
-    return () => {
-      window.clearTimeout(timeoutId);
-    };
-  }, [activeIndex, hasMultipleImages, visibleImages.length]);
+    });
+  }, [visibleImagesKey, visibleImages.length]);
 
   const clearControlsTimeout = () => {
     if (hideControlsTimeoutRef.current !== null) {
@@ -109,44 +124,99 @@ const ServiceImageSlider = ({
     setControlsVisible(false);
   };
 
-  const showControlsTemporarily = () => {
+  const hideControlsQuickly = () => {
     clearControlsTimeout();
-    setControlsVisible(true);
 
     hideControlsTimeoutRef.current = window.setTimeout(() => {
       setControlsVisible(false);
       hideControlsTimeoutRef.current = null;
-    }, 2500);
+    }, MOBILE_CONTROLS_HIDE_DELAY);
   };
 
-  const goToPreviousImage = () => {
-    setActiveIndex((current) => {
-      if (visibleImages.length === 0) return 0;
+  const moveBy = useCallback(
+    (direction: -1 | 1) => {
+      if (!hasMultipleImages || isSliding) return;
 
-      const currentIndex = Math.min(
-        current,
-        visibleImages.length - 1,
-      );
+      setTransitionEnabled(true);
+      setIsSliding(true);
 
-      return currentIndex === 0
-        ? visibleImages.length - 1
-        : currentIndex - 1;
+      setActiveIndex((current) => {
+        const currentIndex = Math.min(
+          current,
+          visibleImages.length - 1,
+        );
+
+        if (direction === 1) {
+          return currentIndex >= visibleImages.length - 1
+            ? 0
+            : currentIndex + 1;
+        }
+
+        return currentIndex === 0
+          ? visibleImages.length - 1
+          : currentIndex - 1;
+      });
+
+      setTrackIndex((current) => current + direction);
+    },
+    [hasMultipleImages, isSliding, visibleImages.length],
+  );
+
+  useEffect(() => {
+    if (!hasMultipleImages || isSliding) return;
+
+    const timeoutId = window.setTimeout(() => {
+      moveBy(1);
+    }, AUTO_PLAY_DELAY);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [
+    activeIndex,
+    hasMultipleImages,
+    isSliding,
+    moveBy,
+  ]);
+
+  const resetTrackWithoutAnimation = (newTrackIndex: number) => {
+    setTransitionEnabled(false);
+    setTrackIndex(newTrackIndex);
+
+    if (transitionFrameRef.current !== null) {
+      window.cancelAnimationFrame(transitionFrameRef.current);
+    }
+
+    transitionFrameRef.current = window.requestAnimationFrame(() => {
+      transitionFrameRef.current = window.requestAnimationFrame(() => {
+        setTransitionEnabled(true);
+        setIsSliding(false);
+        transitionFrameRef.current = null;
+      });
     });
   };
 
-  const goToNextImage = () => {
-    setActiveIndex((current) => {
-      if (visibleImages.length === 0) return 0;
+  const handleTrackTransitionEnd = (
+    event: TransitionEvent<HTMLDivElement>,
+  ) => {
+    if (
+      event.target !== event.currentTarget ||
+      event.propertyName !== 'transform'
+    ) {
+      return;
+    }
 
-      const currentIndex = Math.min(
-        current,
-        visibleImages.length - 1,
-      );
+    if (trackIndex === 0) {
+      resetTrackWithoutAnimation(visibleImages.length);
+      return;
+    }
 
-      return currentIndex >= visibleImages.length - 1
-        ? 0
-        : currentIndex + 1;
-    });
+    if (trackIndex === visibleImages.length + 1) {
+      resetTrackWithoutAnimation(1);
+      return;
+    }
+
+    setIsSliding(false);
   };
 
   const stopLinkNavigation = (
@@ -160,16 +230,14 @@ const ServiceImageSlider = ({
     event: MouseEvent<HTMLButtonElement>,
   ) => {
     stopLinkNavigation(event);
-    goToPreviousImage();
-    showControlsTemporarily();
+    moveBy(-1);
   };
 
   const showNext = (
     event: MouseEvent<HTMLButtonElement>,
   ) => {
     stopLinkNavigation(event);
-    goToNextImage();
-    showControlsTemporarily();
+    moveBy(1);
   };
 
   const showImage = (
@@ -177,8 +245,19 @@ const ServiceImageSlider = ({
     index: number,
   ) => {
     stopLinkNavigation(event);
+
+    if (
+      !hasMultipleImages ||
+      isSliding ||
+      index === safeIndex
+    ) {
+      return;
+    }
+
+    setTransitionEnabled(true);
+    setIsSliding(true);
     setActiveIndex(index);
-    showControlsTemporarily();
+    setTrackIndex(index + 1);
   };
 
   const handleTouchStart = (
@@ -195,7 +274,7 @@ const ServiceImageSlider = ({
       y: touch.clientY,
     };
 
-    showControlsTemporarily();
+    showControls();
   };
 
   const handleTouchMove = (
@@ -225,6 +304,7 @@ const ServiceImageSlider = ({
     const touch = event.changedTouches[0];
 
     touchStartRef.current = null;
+    hideControlsQuickly();
 
     if (!touchStart || !touch || !hasMultipleImages) return;
 
@@ -244,12 +324,16 @@ const ServiceImageSlider = ({
     event.stopPropagation();
 
     if (horizontalDistance < 0) {
-      goToNextImage();
+      moveBy(1);
     } else {
-      goToPreviousImage();
+      moveBy(-1);
     }
+  };
 
-    showControlsTemporarily();
+  const handleTouchCancel = () => {
+    touchStartRef.current = null;
+    didSwipeRef.current = false;
+    hideControlsQuickly();
   };
 
   const preventLinkAfterSwipe = (
@@ -278,28 +362,58 @@ const ServiceImageSlider = ({
     );
   }
 
+  const sliderImages = hasMultipleImages
+    ? [
+        visibleImages[visibleImages.length - 1]!,
+        ...visibleImages,
+        visibleImages[0]!,
+      ]
+    : visibleImages;
+
   const controlsVisibilityClass = controlsVisible
     ? 'pointer-events-auto opacity-100'
-    : 'pointer-events-none opacity-0 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100';
+    : 'pointer-events-none opacity-0';
 
   return (
     <div
       className={`group relative w-full h-full overflow-hidden bg-theme-muted touch-pan-y select-none ${className}`}
       onMouseEnter={showControls}
       onMouseLeave={hideControls}
+      onFocusCapture={showControls}
+      onBlurCapture={hideControls}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchCancel}
       onClickCapture={preventLinkAfterSwipe}
     >
-      <img
-        key={currentImage}
-        src={currentImage}
-        alt={alt}
-        draggable={false}
-        className={`w-full h-full object-cover ${imageClassName}`}
-        onError={() => markImageAsFailed(currentImage)}
-      />
+      <div
+        dir="ltr"
+        className="flex h-full w-full"
+        style={{
+          transform: `translate3d(-${trackIndex * 100}%, 0, 0)`,
+          transition: transitionEnabled
+            ? `transform ${SLIDE_DURATION}ms cubic-bezier(0.22, 1, 0.36, 1)`
+            : 'none',
+          willChange: 'transform',
+        }}
+        onTransitionEnd={handleTrackTransitionEnd}
+      >
+        {sliderImages.map((image, index) => (
+          <div
+            key={`${image}-${index}`}
+            className="h-full w-full min-w-full shrink-0"
+          >
+            <img
+              src={image}
+              alt={alt}
+              draggable={false}
+              className={`w-full h-full object-cover ${imageClassName}`}
+              onError={() => markImageAsFailed(image)}
+            />
+          </div>
+        ))}
+      </div>
 
       {hasMultipleImages && (
         <>
@@ -307,7 +421,7 @@ const ServiceImageSlider = ({
             type="button"
             onClick={showPrevious}
             aria-label="الصورة السابقة"
-            className={`absolute right-3 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white transition-all duration-200 hover:bg-black/70 ${controlsVisibilityClass}`}
+            className={`absolute right-3 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white transition-all duration-150 hover:bg-black/70 ${controlsVisibilityClass}`}
           >
             <ChevronRight className="h-5 w-5" />
           </button>
@@ -316,13 +430,13 @@ const ServiceImageSlider = ({
             type="button"
             onClick={showNext}
             aria-label="الصورة التالية"
-            className={`absolute left-3 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white transition-all duration-200 hover:bg-black/70 ${controlsVisibilityClass}`}
+            className={`absolute left-3 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white transition-all duration-150 hover:bg-black/70 ${controlsVisibilityClass}`}
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
 
           <div
-            className={`absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2 rounded-full bg-black/40 px-3 py-2 transition-opacity duration-200 ${controlsVisibilityClass}`}
+            className={`absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2 rounded-full bg-black/40 px-3 py-2 transition-opacity duration-150 ${controlsVisibilityClass}`}
           >
             {visibleImages.map((image, index) => (
               <button
