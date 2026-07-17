@@ -47,6 +47,20 @@ const ServiceImageSlider = ({
   const currentImage = visibleImages[safeIndex];
   const hasMultipleImages = visibleImages.length > 1;
 
+  useEffect(() => {
+    if (!hasMultipleImages) return;
+
+    const timeoutId = window.setTimeout(() => {
+      setActiveIndex((current) =>
+        current >= visibleImages.length - 1 ? 0 : current + 1,
+      );
+    }, 4000);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [activeIndex, hasMultipleImages, visibleImages.length]);
+
   const stopLinkNavigation = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     event.stopPropagation();
@@ -97,6 +111,7 @@ const ServiceImageSlider = ({
       className={`relative w-full h-full overflow-hidden bg-theme-muted ${className}`}
     >
       <img
+        key={currentImage}
         src={currentImage}
         alt={alt}
         className={`w-full h-full object-cover ${imageClassName}`}
