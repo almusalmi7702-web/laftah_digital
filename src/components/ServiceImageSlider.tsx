@@ -21,6 +21,7 @@ interface ServiceImageSliderProps {
 const AUTO_PLAY_DELAY = 4000;
 const SLIDE_DURATION = 480;
 const MOBILE_CONTROLS_HIDE_DELAY = 600;
+const PRELOAD_MAX_WAIT = 5000;
 
 const ServiceImageSlider = ({
   images,
@@ -41,71 +42,129 @@ const ServiceImageSlider = ({
   const imagesKey = normalizedImages.join('|');
 
   const [activeIndex, setActiveIndex] = useState(0);
-  const [failedImages, setFailedImages] = useState<string[]>([]);
-  const [controlsVisible, setControlsVisible] = useState(false);
-  const [trackIndex, setTrackIndex] = useState(
-    normalizedImages.length > 1 ? 1 : 0,
+  const [targetIndex, setTargetIndex] = useState<number | null>(null);
+  const [slideDirection, setSlideDirection] = useState<-1 | 1 | null>(
+    null,
   );
+  const [trackOffset, setTrackOffset] = useState(0);
   const [transitionEnabled, setTransitionEnabled] = useState(true);
   const [isSliding, setIsSliding] = useState(false);
+  const [controlsVisible, setControlsVisible] = useState(false);
+  const [failedImages, setFailedImages] = useState<string[]>([]);
+  const [isInViewport, setIsInViewport] = useState(false);
+
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const touchStartRef = useRef<{
     x: number;
     y: number;
   } | null>(null);
 
+  const activeIndexRef = useRef(0);
+  const isSlidingRef = useRef(false);
   const didSwipeRef = useRef(false);
+  const loadTokenRef = useRef(0);
+
   const hideControlsTimeoutRef = useRef<number | null>(null);
-  const transitionFrameRef = useRef<number | null>(null);
+  const preloadTimeoutRef = useRef<number | null>(null);
+  const transitionTimeoutRef = useRef<number | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
+  const finishSlideRef = useRef<(() => void) | null>(null);
+
+  const hasMultipleImages = normalizedImages.length > 1;
+
+  const safeIndex = Math.min(
+    activeIndex,
+    Math.max(normalizedImages.length - 1, 0),
+  );
+
+  const currentImage = normalizedImages[safeIndex];
 
   useEffect(() => {
+    activeIndexRef.current = safeIndex;
+  }, [safeIndex]);
+
+  useEffect(() => {
+    const element = containerRef.current;
+
+    if (!element) return;
+
+    if (typeof IntersectionObserver === 'undefined') {
+      setIsInViewport(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInViewport(
+          entry.isIntersecting || entry.intersectionRatio > 0,
+        );
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '150px 0px',
+      },
+    );
+
+    observer.observe(element);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    loadTokenRef.current += 1;
+    activeIndexRef.current = 0;
+    isSlidingRef.current = false;
+    finishSlideRef.current = null;
+
     setActiveIndex(0);
+    setTargetIndex(null);
+    setSlideDirection(null);
+    setTrackOffset(0);
+    setTransitionEnabled(true);
+    setIsSliding(false);
     setFailedImages([]);
+
+    if (preloadTimeoutRef.current !== null) {
+      window.clearTimeout(preloadTimeoutRef.current);
+      preloadTimeoutRef.current = null;
+    }
+
+    if (transitionTimeoutRef.current !== null) {
+      window.clearTimeout(transitionTimeoutRef.current);
+      transitionTimeoutRef.current = null;
+    }
+
+    if (animationFrameRef.current !== null) {
+      window.cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
   }, [imagesKey]);
 
   useEffect(() => {
     return () => {
+      loadTokenRef.current += 1;
+      finishSlideRef.current = null;
+
       if (hideControlsTimeoutRef.current !== null) {
         window.clearTimeout(hideControlsTimeoutRef.current);
       }
 
-      if (transitionFrameRef.current !== null) {
-        window.cancelAnimationFrame(transitionFrameRef.current);
+      if (preloadTimeoutRef.current !== null) {
+        window.clearTimeout(preloadTimeoutRef.current);
+      }
+
+      if (transitionTimeoutRef.current !== null) {
+        window.clearTimeout(transitionTimeoutRef.current);
+      }
+
+      if (animationFrameRef.current !== null) {
+        window.cancelAnimationFrame(animationFrameRef.current);
       }
     };
   }, []);
-
-  const visibleImages = normalizedImages.filter(
-    (image) => !failedImages.includes(image),
-  );
-
-  const visibleImagesKey = visibleImages.join('|');
-  const hasMultipleImages = visibleImages.length > 1;
-
-  const safeIndex = Math.min(
-    activeIndex,
-    Math.max(visibleImages.length - 1, 0),
-  );
-
-  const currentImage = visibleImages[safeIndex];
-
-  useEffect(() => {
-    setActiveIndex(0);
-    setTrackIndex(visibleImages.length > 1 ? 1 : 0);
-    setTransitionEnabled(false);
-    setIsSliding(false);
-
-    if (transitionFrameRef.current !== null) {
-      window.cancelAnimationFrame(transitionFrameRef.current);
-    }
-
-    transitionFrameRef.current = window.requestAnimationFrame(() => {
-      transitionFrameRef.current = window.requestAnimationFrame(() => {
-        setTransitionEnabled(true);
-        transitionFrameRef.current = null;
-      });
-    });
-  }, [visibleImagesKey, visibleImages.length]);
 
   const clearControlsTimeout = () => {
     if (hideControlsTimeoutRef.current !== null) {
@@ -133,37 +192,166 @@ const ServiceImageSlider = ({
     }, MOBILE_CONTROLS_HIDE_DELAY);
   };
 
-  const moveBy = useCallback(
-    (direction: -1 | 1) => {
-      if (!hasMultipleImages || isSliding) return;
+  const markImageAsFailed = useCallback((imageUrl: string) => {
+    setFailedImages((current) =>
+      current.includes(imageUrl)
+        ? current
+        : [...current, imageUrl],
+    );
+  }, []);
 
-      setTransitionEnabled(true);
+  const startTransitionTo = useCallback(
+    (nextIndex: number, direction: -1 | 1) => {
+      if (
+        normalizedImages.length < 2 ||
+        nextIndex < 0 ||
+        nextIndex >= normalizedImages.length ||
+        nextIndex === activeIndexRef.current ||
+        isSlidingRef.current
+      ) {
+        return;
+      }
+
+      const targetImage = normalizedImages[nextIndex];
+
+      if (!targetImage) return;
+
+      const transitionToken = loadTokenRef.current + 1;
+      loadTokenRef.current = transitionToken;
+
+      isSlidingRef.current = true;
       setIsSliding(true);
 
-      setActiveIndex((current) => {
-        const currentIndex = Math.min(
-          current,
-          visibleImages.length - 1,
-        );
+      let transitionStarted = false;
 
-        if (direction === 1) {
-          return currentIndex >= visibleImages.length - 1
-            ? 0
-            : currentIndex + 1;
+      const finishTransition = () => {
+        if (loadTokenRef.current !== transitionToken) return;
+
+        if (transitionTimeoutRef.current !== null) {
+          window.clearTimeout(transitionTimeoutRef.current);
+          transitionTimeoutRef.current = null;
         }
 
-        return currentIndex === 0
-          ? visibleImages.length - 1
-          : currentIndex - 1;
-      });
+        activeIndexRef.current = nextIndex;
+        isSlidingRef.current = false;
+        finishSlideRef.current = null;
 
-      setTrackIndex((current) => current + direction);
+        setActiveIndex(nextIndex);
+        setTargetIndex(null);
+        setSlideDirection(null);
+        setTrackOffset(0);
+        setTransitionEnabled(false);
+        setIsSliding(false);
+
+        if (animationFrameRef.current !== null) {
+          window.cancelAnimationFrame(animationFrameRef.current);
+        }
+
+        animationFrameRef.current = window.requestAnimationFrame(() => {
+          setTransitionEnabled(true);
+          animationFrameRef.current = null;
+        });
+      };
+
+      const beginTransition = () => {
+        if (
+          transitionStarted ||
+          loadTokenRef.current !== transitionToken
+        ) {
+          return;
+        }
+
+        transitionStarted = true;
+
+        if (preloadTimeoutRef.current !== null) {
+          window.clearTimeout(preloadTimeoutRef.current);
+          preloadTimeoutRef.current = null;
+        }
+
+        finishSlideRef.current = finishTransition;
+
+        setTargetIndex(nextIndex);
+        setSlideDirection(direction);
+        setTransitionEnabled(false);
+        setTrackOffset(direction === 1 ? 0 : -100);
+
+        if (animationFrameRef.current !== null) {
+          window.cancelAnimationFrame(animationFrameRef.current);
+        }
+
+        animationFrameRef.current = window.requestAnimationFrame(() => {
+          animationFrameRef.current =
+            window.requestAnimationFrame(() => {
+              if (loadTokenRef.current !== transitionToken) return;
+
+              setTransitionEnabled(true);
+              setTrackOffset(direction === 1 ? -100 : 0);
+
+              transitionTimeoutRef.current = window.setTimeout(
+                finishTransition,
+                SLIDE_DURATION + 200,
+              );
+
+              animationFrameRef.current = null;
+            });
+        });
+      };
+
+      if (failedImages.includes(targetImage)) {
+        beginTransition();
+        return;
+      }
+
+      const imageLoader = new window.Image();
+
+      imageLoader.onload = beginTransition;
+
+      imageLoader.onerror = () => {
+        markImageAsFailed(targetImage);
+        beginTransition();
+      };
+
+      preloadTimeoutRef.current = window.setTimeout(
+        beginTransition,
+        PRELOAD_MAX_WAIT,
+      );
+
+      imageLoader.src = targetImage;
+
+      if (imageLoader.complete) {
+        beginTransition();
+      }
     },
-    [hasMultipleImages, isSliding, visibleImages.length],
+    [failedImages, markImageAsFailed, normalizedImages],
+  );
+
+  const moveBy = useCallback(
+    (direction: -1 | 1) => {
+      if (normalizedImages.length < 2) return;
+
+      const currentIndex = activeIndexRef.current;
+
+      const nextIndex =
+        direction === 1
+          ? (currentIndex + 1) % normalizedImages.length
+          : (currentIndex - 1 + normalizedImages.length) %
+            normalizedImages.length;
+
+      startTransitionTo(nextIndex, direction);
+    },
+    [normalizedImages.length, startTransitionTo],
   );
 
   useEffect(() => {
-    if (!hasMultipleImages || isSliding) return;
+    if (
+      !hasMultipleImages ||
+      !isInViewport ||
+      isSliding ||
+      typeof document === 'undefined' ||
+      document.visibilityState !== 'visible'
+    ) {
+      return;
+    }
 
     const timeoutId = window.setTimeout(() => {
       moveBy(1);
@@ -175,26 +363,10 @@ const ServiceImageSlider = ({
   }, [
     activeIndex,
     hasMultipleImages,
+    isInViewport,
     isSliding,
     moveBy,
   ]);
-
-  const resetTrackWithoutAnimation = (newTrackIndex: number) => {
-    setTransitionEnabled(false);
-    setTrackIndex(newTrackIndex);
-
-    if (transitionFrameRef.current !== null) {
-      window.cancelAnimationFrame(transitionFrameRef.current);
-    }
-
-    transitionFrameRef.current = window.requestAnimationFrame(() => {
-      transitionFrameRef.current = window.requestAnimationFrame(() => {
-        setTransitionEnabled(true);
-        setIsSliding(false);
-        transitionFrameRef.current = null;
-      });
-    });
-  };
 
   const handleTrackTransitionEnd = (
     event: TransitionEvent<HTMLDivElement>,
@@ -206,17 +378,7 @@ const ServiceImageSlider = ({
       return;
     }
 
-    if (trackIndex === 0) {
-      resetTrackWithoutAnimation(visibleImages.length);
-      return;
-    }
-
-    if (trackIndex === visibleImages.length + 1) {
-      resetTrackWithoutAnimation(1);
-      return;
-    }
-
-    setIsSliding(false);
+    finishSlideRef.current?.();
   };
 
   const stopLinkNavigation = (
@@ -246,18 +408,28 @@ const ServiceImageSlider = ({
   ) => {
     stopLinkNavigation(event);
 
+    const currentIndex = activeIndexRef.current;
+
     if (
-      !hasMultipleImages ||
-      isSliding ||
-      index === safeIndex
+      index === currentIndex ||
+      isSlidingRef.current ||
+      normalizedImages.length < 2
     ) {
       return;
     }
 
-    setTransitionEnabled(true);
-    setIsSliding(true);
-    setActiveIndex(index);
-    setTrackIndex(index + 1);
+    const forwardDistance =
+      (index - currentIndex + normalizedImages.length) %
+      normalizedImages.length;
+
+    const backwardDistance =
+      (currentIndex - index + normalizedImages.length) %
+      normalizedImages.length;
+
+    const direction: -1 | 1 =
+      forwardDistance <= backwardDistance ? 1 : -1;
+
+    startTransitionTo(index, direction);
   };
 
   const handleTouchStart = (
@@ -346,14 +518,6 @@ const ServiceImageSlider = ({
     didSwipeRef.current = false;
   };
 
-  const markImageAsFailed = (imageUrl: string) => {
-    setFailedImages((current) =>
-      current.includes(imageUrl)
-        ? current
-        : [...current, imageUrl],
-    );
-  };
-
   if (!currentImage) {
     return (
       <div className={`w-full h-full ${className}`}>
@@ -362,20 +526,49 @@ const ServiceImageSlider = ({
     );
   }
 
-  const sliderImages = hasMultipleImages
-    ? [
-        visibleImages[visibleImages.length - 1]!,
-        ...visibleImages,
-        visibleImages[0]!,
-      ]
-    : visibleImages;
+  const targetImage =
+    targetIndex !== null
+      ? normalizedImages[targetIndex]
+      : undefined;
+
+  const slidingImages =
+    isSliding && targetImage && slideDirection
+      ? slideDirection === 1
+        ? [currentImage, targetImage]
+        : [targetImage, currentImage]
+      : [];
 
   const controlsVisibilityClass = controlsVisible
     ? 'pointer-events-auto opacity-100'
     : 'pointer-events-none opacity-0';
 
+  const renderSlide = (
+    imageUrl: string,
+    key: string,
+  ) => (
+    <div
+      key={key}
+      className="h-full w-full min-w-full shrink-0"
+    >
+      {failedImages.includes(imageUrl) ? (
+        <ImagePlaceholder />
+      ) : (
+        <img
+          src={imageUrl}
+          alt={alt}
+          loading="lazy"
+          decoding="async"
+          draggable={false}
+          className={`w-full h-full object-cover ${imageClassName}`}
+          onError={() => markImageAsFailed(imageUrl)}
+        />
+      )}
+    </div>
+  );
+
   return (
     <div
+      ref={containerRef}
       className={`group relative w-full h-full overflow-hidden bg-theme-muted touch-pan-y select-none ${className}`}
       onMouseEnter={showControls}
       onMouseLeave={hideControls}
@@ -387,33 +580,30 @@ const ServiceImageSlider = ({
       onTouchCancel={handleTouchCancel}
       onClickCapture={preventLinkAfterSwipe}
     >
-      <div
-        dir="ltr"
-        className="flex h-full w-full"
-        style={{
-          transform: `translate3d(-${trackIndex * 100}%, 0, 0)`,
-          transition: transitionEnabled
-            ? `transform ${SLIDE_DURATION}ms cubic-bezier(0.22, 1, 0.36, 1)`
-            : 'none',
-          willChange: 'transform',
-        }}
-        onTransitionEnd={handleTrackTransitionEnd}
-      >
-        {sliderImages.map((image, index) => (
-          <div
-            key={`${image}-${index}`}
-            className="h-full w-full min-w-full shrink-0"
-          >
-            <img
-              src={image}
-              alt={alt}
-              draggable={false}
-              className={`w-full h-full object-cover ${imageClassName}`}
-              onError={() => markImageAsFailed(image)}
-            />
-          </div>
-        ))}
-      </div>
+      {slidingImages.length === 2 ? (
+        <div
+          dir="ltr"
+          className="flex h-full w-full"
+          style={{
+            transform: `translate3d(${trackOffset}%, 0, 0)`,
+            transition: transitionEnabled
+              ? `transform ${SLIDE_DURATION}ms cubic-bezier(0.22, 1, 0.36, 1)`
+              : 'none',
+          }}
+          onTransitionEnd={handleTrackTransitionEnd}
+        >
+          {slidingImages.map((imageUrl, index) =>
+            renderSlide(
+              imageUrl,
+              `${imageUrl}-${slideDirection}-${index}`,
+            ),
+          )}
+        </div>
+      ) : (
+        <div className="h-full w-full">
+          {renderSlide(currentImage, currentImage)}
+        </div>
+      )}
 
       {hasMultipleImages && (
         <>
@@ -438,9 +628,9 @@ const ServiceImageSlider = ({
           <div
             className={`absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2 rounded-full bg-black/40 px-3 py-2 transition-opacity duration-150 ${controlsVisibilityClass}`}
           >
-            {visibleImages.map((image, index) => (
+            {normalizedImages.map((imageUrl, index) => (
               <button
-                key={image}
+                key={imageUrl}
                 type="button"
                 onClick={(event) => showImage(event, index)}
                 aria-label={`عرض الصورة ${index + 1}`}
