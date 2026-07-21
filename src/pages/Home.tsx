@@ -319,15 +319,11 @@ const PortfolioPreview = () => {
                   style={{ transitionDelay: `${i * 50}ms` }}
                 >
                   <div className="aspect-video bg-theme-muted overflow-hidden">
-                    {item.thumbnail_url ? (
-                      <img
-                        src={item.thumbnail_url}
-                        alt={item.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    ) : (
-                      <ImagePlaceholder variant="full" />
-                    )}
+                    <ServiceImageSlider
+                      images={item.images}
+                      alt={item.title}
+                      imageClassName="group-hover:scale-105 transition-transform duration-500"
+                    />
                   </div>
 
                   <div className="p-4 text-right">

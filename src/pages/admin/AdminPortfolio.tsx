@@ -80,8 +80,8 @@ const AdminPortfolio = () => {
             {items.map((item) => (
               <div key={item.id} className="bg-theme-surface rounded-xl shadow-theme-card border border-theme-border overflow-hidden hover:shadow-theme-elevated transition-all">
                 <div className="aspect-video bg-theme-muted relative">
-                  {item.thumbnail_url ? (
-                    <img src={item.thumbnail_url} alt={item.title} className="w-full h-full object-cover" />
+                  {item.images?.[0] ? (
+                    <img src={item.images[0]} alt={item.title} className="w-full h-full object-cover" />
                   ) : (
                     <ImagePlaceholder />
                   )}

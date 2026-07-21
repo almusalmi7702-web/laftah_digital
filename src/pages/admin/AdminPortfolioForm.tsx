@@ -5,7 +5,7 @@ import {
   getPortfolioItemById, createPortfolioItem, updatePortfolioItem
 } from '../../services/dataService';
 import { useToast } from '../../hooks/useToast';
-import ImageUpload from '../../components/admin/ImageUpload';
+import MultiImageUpload from '../../components/admin/MultiImageUpload';
 import { generateSlug, sanitizeSlug } from '../../utils/slug';
 import type { PortfolioInsert } from '../../types/database';
 
@@ -23,7 +23,7 @@ const AdminPortfolioForm = () => {
     short_description: '',
     details: '',
     category: '',
-    thumbnail_url: '' as string | null,
+    images: [] as string[],
     external_url: '',
     project_date: '',
     is_published: true,
@@ -47,7 +47,7 @@ const AdminPortfolioForm = () => {
           short_description: item.short_description || '',
           details: item.details || '',
           category: item.category || '',
-          thumbnail_url: item.thumbnail_url || null,
+          images: item.images ?? [],
           external_url: item.external_url || '',
           project_date: item.project_date || '',
           is_published: item.is_published ?? true,
@@ -81,7 +81,7 @@ const AdminPortfolioForm = () => {
         short_description: form.short_description.trim() || null,
         details: form.details.trim() || null,
         category: form.category.trim() || null,
-        thumbnail_url: form.thumbnail_url?.trim() || null,
+        images: form.images,
         external_url: form.external_url.trim() || null,
         project_date: form.project_date || null,
         is_published: form.is_published,
@@ -169,11 +169,11 @@ const AdminPortfolioForm = () => {
             </div>
           </div>
 
-          <ImageUpload
+          <MultiImageUpload
             bucket="portfolio"
-            value={form.thumbnail_url}
-            onChange={(url) => setForm({ ...form, thumbnail_url: url })}
-            label="صورة العمل (موصى به: 1200×675)"
+            value={form.images}
+            onChange={(images) => setForm({ ...form, images })}
+            label="صور العمل (موصى به: 1200×675)"
           />
 
           <div>

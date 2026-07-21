@@ -1,17 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, ExternalLink, Calendar, MessageCircle } from 'lucide-react';
-import { getPortfolioItemBySlug, getPortfolioImages } from '../services/dataService';
+import { getPortfolioItemBySlug } from '../services/dataService';
 import { messages } from '../data/content';
 import { useSiteSettings } from '../hooks/useSiteSettings';
-import ImagePlaceholder from '../components/ImagePlaceholder';
-import type { PortfolioItem, PortfolioImage } from '../types/database';
+import ServiceImageSlider from '../components/ServiceImageSlider';
+import type { PortfolioItem } from '../types/database';
 
 const PortfolioDetail = () => {
   const { slug } = useParams();
   const { siteSettings, getWhatsAppLink } = useSiteSettings();
   const [item, setItem] = useState<PortfolioItem | null>(null);
-  const [images, setImages] = useState<PortfolioImage[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -21,8 +20,6 @@ const PortfolioDetail = () => {
         const data = await getPortfolioItemBySlug(slug);
         if (data) {
           setItem(data);
-          const imgs = await getPortfolioImages(data.id);
-          setImages(imgs);
         }
       } catch (err) {
         console.error('Error:', err);
@@ -65,15 +62,12 @@ const PortfolioDetail = () => {
         </Link>
 
         <div className="bg-theme-surface rounded-2xl shadow-theme-card border border-theme-border overflow-hidden">
-          {item.thumbnail_url ? (
-            <div className="aspect-video w-full bg-theme-muted">
-              <img src={item.thumbnail_url} alt={item.title} className="w-full h-full object-cover" />
-            </div>
-          ) : (
-            <div className="aspect-video w-full">
-              <ImagePlaceholder variant="full" />
-            </div>
-          )}
+          <div className="aspect-video w-full bg-theme-muted">
+            <ServiceImageSlider
+              images={item.images}
+              alt={item.title}
+            />
+          </div>
 
           <div className="p-8">
             <div className="flex items-start justify-between gap-4 mb-6">
@@ -110,19 +104,6 @@ const PortfolioDetail = () => {
               </div>
             )}
           </div>
-
-          {images.length > 0 && (
-            <div className="px-8 pb-8">
-              <h3 className="text-lg font-bold text-theme-text mb-4">معرض الصور</h3>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {images.map((img) => (
-                  <div key={img.id} className="aspect-video bg-theme-muted rounded-xl overflow-hidden">
-                    <img src={img.image_url} alt={img.alt_text || ''} className="w-full h-full object-cover" />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
 
           <div className="px-8 pb-8">
             <div className="bg-theme-primary-soft rounded-xl p-6 text-center">

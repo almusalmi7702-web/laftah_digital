@@ -5,7 +5,7 @@ import { useInView } from '../hooks/useInView';
 import { getPortfolioItems } from '../services/dataService';
 import { portfolio as portfolioContent, messages } from '../data/content';
 import { useSiteSettings } from '../hooks/useSiteSettings';
-import ImagePlaceholder from '../components/ImagePlaceholder';
+import ServiceImageSlider from '../components/ServiceImageSlider';
 import { PortfolioSkeleton } from '../components/Skeleton';
 import type { PortfolioItem } from '../types/database';
 
@@ -97,11 +97,11 @@ const PortfolioGrid = ({ items, isInView }: PortfolioGridProps) => {
               style={{ transitionDelay: `${i * 80}ms` }}
             >
               <div className="aspect-video bg-theme-muted">
-                {item.thumbnail_url ? (
-                  <img src={item.thumbnail_url} alt={item.title} className="w-full h-full object-cover" />
-                ) : (
-                  <ImagePlaceholder />
-                )}
+                <ServiceImageSlider
+                  images={item.images}
+                  alt={item.title}
+                  imageClassName="group-hover:scale-105 transition-transform duration-500"
+                />
               </div>
               <div className="p-6 text-right">
                 {item.category && (

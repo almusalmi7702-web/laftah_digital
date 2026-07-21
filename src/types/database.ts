@@ -11,7 +11,7 @@ export interface PortfolioItem {
   short_description: string | null;
   details: string | null;
   category: string | null;
-  thumbnail_url: string | null;
+  images: string[];
   project_date: string | null;
   external_url: string | null;
   is_published: boolean;
