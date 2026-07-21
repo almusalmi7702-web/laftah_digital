@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { Upload, Trash2, Loader2, Image as ImageIcon } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { compressImageForUpload } from '../../utils/imageCompression';
 
 interface ImageUploadProps {
   bucket: 'portfolio' | 'services' | 'uploads';
@@ -35,6 +36,12 @@ const getExtensionFromFile = (file: File): string => {
   if (file.type === 'image/png') return 'png';
   if (file.type === 'image/webp') return 'webp';
   return 'jpg';
+};
+
+const formatFileSize = (bytes: number): string => {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 };
 
 const getFriendlyUploadError = (error: any): string => {
@@ -82,6 +89,7 @@ const ImageUpload = ({
 }: ImageUploadProps) => {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,6 +97,7 @@ const ImageUpload = ({
     if (!file) return;
 
     setError('');
+    setSuccess('');
 
     if (!ACCEPTED_TYPES.includes(file.type)) {
       setError('صيغة الصورة غير مدعومة. استخدم JPG أو PNG أو WebP.');
@@ -120,7 +129,19 @@ const ImageUpload = ({
         return;
       }
 
-      const ext = getExtensionFromFile(file);
+      let fileToUpload = file;
+      let compressionResult = null;
+
+      try {
+        compressionResult = await compressImageForUpload(file);
+        fileToUpload = compressionResult.file;
+      } catch (compressionErr: any) {
+        console.error('Image compression error:', compressionErr);
+        setError('تعذر ضغط الصورة. جرّب صورة أخرى.');
+        return;
+      }
+
+      const ext = getExtensionFromFile(fileToUpload);
       const dateFolder = new Date().toISOString().slice(0, 10);
       const randomPart =
         typeof crypto !== 'undefined' && 'randomUUID' in crypto
@@ -132,10 +153,10 @@ const ImageUpload = ({
       const { error: uploadError } = await withTimeout(
         supabase.storage
           .from(bucket)
-          .upload(filePath, file, {
+          .upload(filePath, fileToUpload, {
             cacheControl: '3600',
             upsert: false,
-            contentType: file.type,
+            contentType: fileToUpload.type,
           })
       );
 
@@ -152,6 +173,14 @@ const ImageUpload = ({
       }
 
       onChange(publicUrlData.publicUrl);
+
+      if (compressionResult?.wasCompressed) {
+        setSuccess(
+          `تم ضغط الصورة من ${formatFileSize(compressionResult.originalSize)} إلى ${formatFileSize(compressionResult.compressedSize)}`
+        );
+      } else {
+        setSuccess('تم رفع الصورة بنجاح');
+      }
     } catch (err: any) {
       console.error('Upload error details:', err);
       setError(getFriendlyUploadError(err));
@@ -167,6 +196,7 @@ const ImageUpload = ({
   const handleRemove = () => {
     onChange(null);
     setError('');
+    setSuccess('');
   };
 
   return (
@@ -198,7 +228,7 @@ const ImageUpload = ({
           {uploading ? (
             <>
               <Loader2 className="w-8 h-8 animate-spin text-theme-primary" />
-              <span className="text-sm font-semibold">جاري الرفع...</span>
+              <span className="text-sm font-semibold">جاري ضغط الصورة ورفعها...</span>
             </>
           ) : (
             <>
@@ -218,6 +248,10 @@ const ImageUpload = ({
 
       {error && (
         <p className="text-theme-danger text-sm mt-2 leading-relaxed">{error}</p>
+      )}
+
+      {success && !uploading && (
+        <p className="text-theme-success text-sm mt-2 leading-relaxed">{success}</p>
       )}
 
       <input

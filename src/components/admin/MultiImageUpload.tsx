@@ -8,6 +8,7 @@ import {
   ChevronLeft,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { compressImageForUpload } from '../../utils/imageCompression';
 
 interface MultiImageUploadProps {
   bucket: 'portfolio' | 'services' | 'uploads';
@@ -51,6 +52,12 @@ const getExtensionFromFile = (file: File): string => {
   if (file.type === 'image/webp') return 'webp';
 
   return 'jpg';
+};
+
+const formatFileSize = (bytes: number): string => {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 };
 
 const getFriendlyUploadError = (error: any): string => {
@@ -105,6 +112,7 @@ const MultiImageUpload = ({
 }: MultiImageUploadProps) => {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const images = Array.isArray(value)
@@ -119,6 +127,7 @@ const MultiImageUpload = ({
     if (files.length === 0) return;
 
     setError('');
+    setSuccess('');
 
     if (
       maxImages &&
@@ -174,9 +183,29 @@ const MultiImageUpload = ({
       }
 
       const uploadedImages = [...images];
+      let totalOriginalSize = 0;
+      let totalCompressedSize = 0;
+      let compressedCount = 0;
+      let failedCompressionCount = 0;
 
       for (const file of files) {
-        const extension = getExtensionFromFile(file);
+        let fileToUpload = file;
+        let compressionResult = null;
+
+        try {
+          compressionResult = await compressImageForUpload(file);
+          fileToUpload = compressionResult.file;
+          totalOriginalSize += compressionResult.originalSize;
+          totalCompressedSize += compressionResult.compressedSize;
+          if (compressionResult.wasCompressed) compressedCount += 1;
+        } catch (compressionErr: any) {
+          console.error('Image compression error:', compressionErr);
+          failedCompressionCount += 1;
+          setError('تعذر ضغط إحدى الصور. جرّب صورة أخرى.');
+          break;
+        }
+
+        const extension = getExtensionFromFile(fileToUpload);
         const dateFolder = new Date()
           .toISOString()
           .slice(0, 10);
@@ -193,10 +222,10 @@ const MultiImageUpload = ({
         const { error: uploadError } = await withTimeout(
           supabase.storage
             .from(bucket)
-            .upload(filePath, file, {
+            .upload(filePath, fileToUpload, {
               cacheControl: '3600',
               upsert: false,
-              contentType: file.type,
+              contentType: fileToUpload.type,
             })
         );
 
@@ -217,6 +246,20 @@ const MultiImageUpload = ({
         // الاحتفاظ بالصور التي نجح رفعها حتى لو تعثر رفع صورة لاحقة
         onChange([...uploadedImages]);
       }
+
+      if (failedCompressionCount === 0) {
+        if (files.length === 1 && compressedCount === 1) {
+          setSuccess(
+            `تم ضغط الصورة من ${formatFileSize(totalOriginalSize)} إلى ${formatFileSize(totalCompressedSize)}`
+          );
+        } else if (compressedCount > 0) {
+          setSuccess(
+            `تم ضغط ${compressedCount} صور ورفعها بنجاح (من ${formatFileSize(totalOriginalSize)} إلى ${formatFileSize(totalCompressedSize)})`
+          );
+        } else {
+          setSuccess('تم رفع الصور بنجاح');
+        }
+      }
     } catch (uploadError: any) {
       console.error('Multiple images upload error:', uploadError);
       setError(getFriendlyUploadError(uploadError));
@@ -232,6 +275,7 @@ const MultiImageUpload = ({
   const removeImage = (index: number) => {
     onChange(images.filter((_, imageIndex) => imageIndex !== index));
     setError('');
+    setSuccess('');
   };
 
   const moveImage = (
@@ -338,7 +382,7 @@ const MultiImageUpload = ({
           <>
             <Loader2 className="w-8 h-8 animate-spin text-theme-primary" />
             <span className="text-sm font-semibold">
-              جاري رفع الصور...
+              جاري ضغط الصور ورفعها...
             </span>
           </>
         ) : (
@@ -370,6 +414,12 @@ const MultiImageUpload = ({
       {error && (
         <p className="text-theme-danger text-sm mt-2 leading-relaxed">
           {error}
+        </p>
+      )}
+
+      {success && !uploading && (
+        <p className="text-theme-success text-sm mt-2 leading-relaxed">
+          {success}
         </p>
       )}
 
