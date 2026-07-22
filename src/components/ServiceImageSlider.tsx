@@ -626,6 +626,7 @@ const ServiceImageSlider = ({
           </button>
 
           <div
+            dir="ltr"
             className={`absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2 rounded-full bg-black/40 px-3 py-2 transition-opacity duration-150 ${controlsVisibilityClass}`}
           >
             {normalizedImages.map((imageUrl, index) => (
