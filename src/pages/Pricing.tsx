@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -6,10 +6,9 @@ import {
   MessageCircle,
 } from 'lucide-react';
 import { useInView } from '../hooks/useInView';
-import { getPricingPlans } from '../services/dataService';
+import { usePublicPricing } from '../hooks/usePublicData';
 import { packages, messages } from '../data/content';
 import { useSiteSettings } from '../hooks/useSiteSettings';
-import type { PricingPlan } from '../types/database';
 
 const pricingFaqs = [
   {
@@ -131,39 +130,11 @@ const Pricing = () => {
 const PackagesGrid = () => {
   const { ref, isInView } = useInView();
   const { siteSettings, getWhatsAppLink } = useSiteSettings();
+  const { data: plans, isInitialLoading } = usePublicPricing();
 
-  const [plans, setPlans] = useState<PricingPlan[]>([]);
-  const [loading, setLoading] = useState(true);
+  const displayPlans = plans && plans.length > 0 ? plans : null;
 
-  useEffect(() => {
-    let mounted = true;
-
-    const fetchPlans = async () => {
-      try {
-        const data = await getPricingPlans();
-
-        if (mounted) {
-          setPlans(data);
-        }
-      } catch (err) {
-        console.error('Error fetching pricing plans:', err);
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchPlans();
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  const displayPlans = plans.length > 0 ? plans : null;
-
-  if (loading) {
+  if (isInitialLoading) {
     return (
       <section className="py-20 bg-theme-page">
         <div

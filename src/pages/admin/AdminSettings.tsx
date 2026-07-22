@@ -10,6 +10,7 @@ import {
   updateSocialLink,
   deleteSocialLink,
 } from '../../services/settingsService';
+import { invalidateSiteSettings, invalidateSocialLinks } from '../../lib/cacheInvalidation';
 import type { SocialLink } from '../../types/settings';
 
 const emailIsValid = (email: string): boolean =>
@@ -142,6 +143,7 @@ const AdminSettings = () => {
         contact_email: contactForm.contact_email.trim(),
         email_enabled: contactForm.email_enabled,
       });
+      invalidateSiteSettings();
       showToast('success', 'تم حفظ إعدادات التواصل بنجاح.');
       await refreshSettings();
     } catch (error: unknown) {
@@ -227,6 +229,7 @@ const AdminSettings = () => {
         await createSocialLink(payload);
         showToast('success', 'تمت إضافة وسيلة التواصل بنجاح.');
       }
+      invalidateSocialLinks();
       setShowLinkForm(false);
       await fetchLinks();
       await refreshSettings();
@@ -244,6 +247,7 @@ const AdminSettings = () => {
     try {
       await deleteSocialLink(deleteLinkId);
       setLinks(links.filter((l) => l.id !== deleteLinkId));
+      invalidateSocialLinks();
       showToast('success', 'تم حذف وسيلة التواصل بنجاح.');
       await refreshSettings();
     } catch (error: unknown) {
@@ -262,6 +266,7 @@ const AdminSettings = () => {
           l.id === link.id ? { ...l, is_active: !l.is_active } : l
         )
       );
+      invalidateSocialLinks();
       showToast('success', link.is_active ? 'تم إخفاء الوسيلة' : 'تم تفعيل الوسيلة');
       await refreshSettings();
     } catch (error: unknown) {

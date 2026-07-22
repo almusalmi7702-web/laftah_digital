@@ -6,11 +6,15 @@ import {
   useCallback,
   ReactNode,
 } from 'react';
-import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import {
   WHATSAPP_NUMBER,
   WHATSAPP_DISPLAY,
 } from '../data/content';
+import {
+  getPublicSiteSettings,
+  getPublicSocialLinks,
+  onCrossTabUpdate,
+} from '../lib/publicDataClient';
 import type { SiteSettings, SocialLink } from '../types/settings';
 
 // ---- Fallback values (kept in sync with content.ts) ----
@@ -23,9 +27,6 @@ const FALLBACK_SETTINGS: SiteSettings = {
   email_enabled: true,
   updated_at: null,
 };
-
-const STORAGE_KEY = 'laftah_settings_cache_v1';
-const TIMEOUT_MS = 12000;
 
 export const cleanWhatsAppNumber = (raw: string): string =>
   (raw || '').replace(/[^\d]/g, '');
@@ -45,88 +46,56 @@ const SiteSettingsContext = createContext<
   SiteSettingsContextValue | undefined
 >(undefined);
 
-const getCachedSettings = (): SiteSettings | null => {
-  if (typeof window === 'undefined') return null;
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    if (parsed && typeof parsed.whatsapp_number === 'string') {
-      return parsed as SiteSettings;
-    }
-  } catch {
-    // ignore
-  }
-  return null;
-};
-
 export const SiteSettingsProvider = ({
   children,
 }: {
   children: ReactNode;
 }) => {
-  const [siteSettings, setSiteSettings] = useState<SiteSettings>(
-    () => getCachedSettings() ?? FALLBACK_SETTINGS
-  );
+  const [siteSettings, setSiteSettings] = useState<SiteSettings>(FALLBACK_SETTINGS);
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const refreshSettings = useCallback(async () => {
-    const configured = isSupabaseConfigured();
-    if (!configured) {
-      setSiteSettings(FALLBACK_SETTINGS);
-      setLoading(false);
-      return;
-    }
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
-
     try {
-      const [settingsRes, linksRes] = await Promise.all([
-        supabase
-          .from('site_settings')
-          .select('*')
-          .eq('id', 1)
-          .maybeSingle(),
-        supabase
-          .from('social_links')
-          .select('*')
-          .order('sort_order', { ascending: true }),
+      const [settingsResult, linksResult] = await Promise.all([
+        getPublicSiteSettings(),
+        getPublicSocialLinks(),
       ]);
 
-      if (settingsRes.error) {
-        console.error('site_settings error:', settingsRes.error);
-        setError(settingsRes.error.message);
-      } else if (settingsRes.data) {
-        const next: SiteSettings = settingsRes.data as SiteSettings;
-        setSiteSettings(next);
-        try {
-          window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-        } catch {
-          // ignore
-        }
+      if (settingsResult.data) {
+        setSiteSettings(settingsResult.data);
         setError(null);
+      } else if (settingsResult.error) {
+        setError(settingsResult.error);
+        // Keep existing settings (fallback or last-known-good)
       }
 
-      if (linksRes.error) {
-        console.error('social_links error:', linksRes.error);
-        setSocialLinks([]);
-      } else {
-        setSocialLinks((linksRes.data as SocialLink[]) ?? []);
+      if (linksResult.data) {
+        setSocialLinks(linksResult.data);
       }
+      // On error, keep existing social links (last-known-good)
     } catch (err) {
       console.error('Site settings fetch failed:', err);
       setError(err instanceof Error ? err.message : 'fetch failed');
+      // Keep existing data — don't overwrite with empty
     } finally {
-      clearTimeout(timeoutId);
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
     refreshSettings();
+  }, [refreshSettings]);
+
+  // Cross-tab sync: refresh when another tab updates the cache
+  useEffect(() => {
+    const unsubscribe = onCrossTabUpdate((resource) => {
+      if (resource === 'site-settings' || resource === 'social-links' || resource === 'home') {
+        refreshSettings();
+      }
+    });
+    return unsubscribe;
   }, [refreshSettings]);
 
   const getCleanWhatsAppNumber = useCallback(

@@ -1,45 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { useInView } from '../hooks/useInView';
-import { getFaqs } from '../services/dataService';
-
-interface FAQ {
-  id: string;
-  question: string;
-  answer: string;
-}
+import { usePublicFaqs } from '../hooks/usePublicData';
 
 const FAQSection = () => {
-  const [faqs, setFaqs] = useState<FAQ[]>([]);
+  const { data: faqs } = usePublicFaqs();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const { ref, isInView } = useInView();
 
-  useEffect(() => {
-    let mounted = true;
+  if (!faqs || faqs.length === 0) return null;
 
-    const fetchFaqs = async () => {
-      try {
-        const data = await getFaqs();
-
-        if (mounted) {
-          setFaqs(data);
-        }
-      } catch (err) {
-        console.error('Error fetching FAQs:', err);
-      }
-    };
-
-    fetchFaqs();
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  if (faqs.length === 0) return null;
-
-  const previewFaqs = faqs.slice(0, 5);
+  const previewFaqs = faqs!.slice(0, 5);
 
   return (
     <section className="py-16 bg-theme-page" ref={ref}>
@@ -99,7 +71,7 @@ const FAQSection = () => {
           ))}
         </div>
 
-        {faqs.length > 5 && (
+        {faqs!.length > 5 && (
           <div className="text-center mt-10">
             <Link
               to="/faqs"

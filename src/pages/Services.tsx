@@ -1,41 +1,15 @@
-import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Instagram, ShoppingBag, Image, Palette,
   FileText, Presentation, Calendar, ArrowLeft,
 } from 'lucide-react';
 import { useInView } from '../hooks/useInView';
-import { getServices } from '../services/dataService';
+import { usePublicServices } from '../hooks/usePublicData';
 import { servicesList, messages } from '../data/content';
 import { useSiteSettings } from '../hooks/useSiteSettings';
 import ServiceImageSlider from '../components/ServiceImageSlider';
-import type { Service } from '../types/database';
 
 const staticIcons = [Instagram, ShoppingBag, Image, Palette, FileText, Presentation, Calendar];
-const SERVICES_CACHE_KEY = 'laftah_services_cache_v1';
-
-const getCachedServices = (): Service[] => {
-  if (typeof window === 'undefined') return [];
-
-  try {
-    const cached = sessionStorage.getItem(SERVICES_CACHE_KEY);
-    if (!cached) return [];
-    const parsed = JSON.parse(cached);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-};
-
-const setCachedServices = (services: Service[]) => {
-  if (typeof window === 'undefined') return;
-
-  try {
-    sessionStorage.setItem(SERVICES_CACHE_KEY, JSON.stringify(services));
-  } catch {
-    // Ignore storage errors
-  }
-};
 
 const Services = () => {
   const { ref, isInView } = useInView(0.05);
@@ -93,42 +67,14 @@ const Services = () => {
 
 const ServicesList = () => {
   const { ref, isInView } = useInView();
-  const [services, setServices] = useState<Service[]>(() => getCachedServices());
-  const [loading, setLoading] = useState(() => getCachedServices().length === 0);
+  const { data: services, isInitialLoading } = usePublicServices();
 
-  useEffect(() => {
-    let mounted = true;
-
-    const fetchServices = async () => {
-      try {
-        const data = await getServices();
-
-        if (!mounted) return;
-
-        setServices(data);
-        setCachedServices(data);
-      } catch (err) {
-        console.error('Error fetching services:', err);
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchServices();
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  const displayServices = services.length > 0 ? services : null;
+  const displayServices = services && services.length > 0 ? services : null;
 
   return (
     <section className="py-20 bg-theme-page">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" ref={ref}>
-        {loading ? (
+        {isInitialLoading ? (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
               <ServiceCardSkeleton key={i} />

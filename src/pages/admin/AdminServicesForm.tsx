@@ -4,6 +4,7 @@ import { ArrowLeft, Save, Loader2, Plus, X } from 'lucide-react';
 import {
   getAllServices, createService, updateService
 } from '../../services/dataService';
+import { invalidateServices } from '../../lib/cacheInvalidation';
 import { useToast } from '../../hooks/useToast';
 import MultiImageUpload from '../../components/admin/MultiImageUpload';
 import { generateSlug, sanitizeSlug } from '../../utils/slug';
@@ -106,6 +107,7 @@ images: item.images ?? [],
         showToast('success', 'تم الحفظ بنجاح');
       }
 
+      invalidateServices();
       navigate('/admin/services', { replace: true });
     } catch (err: any) {
       console.error('Error saving:', err);

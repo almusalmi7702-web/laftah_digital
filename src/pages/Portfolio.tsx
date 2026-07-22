@@ -1,8 +1,7 @@
-import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { useInView } from '../hooks/useInView';
-import { getPortfolioItems } from '../services/dataService';
+import { usePublicPortfolio } from '../hooks/usePublicData';
 import { portfolio as portfolioContent, messages } from '../data/content';
 import { useSiteSettings } from '../hooks/useSiteSettings';
 import ServiceImageSlider from '../components/ServiceImageSlider';
@@ -11,41 +10,9 @@ import type { PortfolioItem } from '../types/database';
 
 const Portfolio = () => {
   const { ref, isInView } = useInView(0.05);
-  const [items, setItems] = useState<PortfolioItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: items, isInitialLoading, error } = usePublicPortfolio();
 
-  useEffect(() => {
-    let mounted = true;
-
-    const fetch = async () => {
-      try {
-        setError(null);
-        const data = await getPortfolioItems();
-        if (mounted) {
-          setItems(data);
-        }
-      } catch (err: any) {
-        console.error('Error fetching portfolio:', err);
-        if (mounted) {
-          setError(err.message || 'حدث خطأ في جلب الأعمال');
-          setItems([]);
-        }
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetch();
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  const hasItems = items.length > 0;
+  const hasItems = !!(items && items.length > 0);
 
   return (
     <div className="pt-20">
@@ -62,16 +29,16 @@ const Portfolio = () => {
       </section>
 
       {/* Content */}
-      {loading ? (
+      {isInitialLoading ? (
         <section className="py-20 bg-theme-page">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[0,1,2,3,4,5].map((i) => <PortfolioSkeleton key={i} />)}
           </div>
         </section>
-      ) : error ? (
+      ) : error && !hasItems ? (
         <EmptyState error={error} />
       ) : hasItems ? (
-        <PortfolioGrid items={items} isInView={isInView} />
+        <PortfolioGrid items={items!} isInView={isInView} />
       ) : (
         <EmptyState />
       )}

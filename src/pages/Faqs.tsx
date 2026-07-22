@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ChevronDown,
@@ -7,45 +7,16 @@ import {
   MessageCircle,
 } from 'lucide-react';
 import { useInView } from '../hooks/useInView';
-import { getFaqs } from '../services/dataService';
+import { usePublicFaqs } from '../hooks/usePublicData';
 import { useSiteSettings } from '../hooks/useSiteSettings';
 import { messages } from '../data/content';
 import { FaqSkeleton } from '../components/Skeleton';
-import type { Faq } from '../types/database';
 
 const Faqs = () => {
   const { ref, isInView } = useInView(0.05);
   const { siteSettings, getWhatsAppLink } = useSiteSettings();
-
-  const [faqs, setFaqs] = useState<Faq[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: faqs, isInitialLoading } = usePublicFaqs();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-
-  useEffect(() => {
-    let mounted = true;
-
-    const fetchData = async () => {
-      try {
-        const data = await getFaqs();
-
-        if (mounted) {
-          setFaqs(data);
-        }
-      } catch (err) {
-        console.error('Error fetching FAQs:', err);
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchData();
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
 
   return (
     <div className="pt-20">
@@ -90,9 +61,9 @@ const Faqs = () => {
       {/* FAQ Content */}
       <section className="py-16 bg-theme-page">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          {loading ? (
+          {isInitialLoading ? (
             <FaqSkeleton />
-          ) : faqs.length === 0 ? (
+          ) : faqs && faqs.length === 0 ? (
             <div className="bg-gradient-to-br from-theme-primary-soft to-theme-muted rounded-3xl p-8 sm:p-12 border border-theme-border text-center">
               <div className="w-20 h-20 bg-theme-primary-soft rounded-full flex items-center justify-center mx-auto mb-6">
                 <HelpCircle className="w-10 h-10 text-theme-primary" />
@@ -118,7 +89,7 @@ const Faqs = () => {
           ) : (
             <>
               <div className="space-y-4">
-                {faqs.map((faq, i) => (
+                {faqs!.map((faq, i) => (
                   <div
                     key={faq.id}
                     className="bg-theme-muted rounded-xl border border-theme-border overflow-hidden transition-all duration-300 hover:border-theme-primary"

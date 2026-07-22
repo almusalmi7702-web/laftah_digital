@@ -1,36 +1,18 @@
-import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, Check, MessageCircle } from 'lucide-react';
-import { getServiceBySlug } from '../services/dataService';
+import { usePublicServiceBySlug } from '../hooks/usePublicData';
 import { servicesList as staticServices } from '../data/content';
 import { useSiteSettings } from '../hooks/useSiteSettings';
 import ServiceImageSlider from '../components/ServiceImageSlider';
-import type { Service } from '../types/database';
 
 const ServiceDetail = () => {
   const { slug } = useParams();
   const { siteSettings, getWhatsAppLink } = useSiteSettings();
-  const [service, setService] = useState<Service | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetch = async () => {
-      if (!slug) return;
-      try {
-        const data = await getServiceBySlug(slug);
-        setService(data);
-      } catch (err) {
-        console.error('Error:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetch();
-  }, [slug]);
+  const { data: service, isInitialLoading, notFound, error, retry } = usePublicServiceBySlug(slug);
 
   const staticService = staticServices.find(s => s.title.toLowerCase().includes(slug?.toLowerCase() || ''));
 
-  if (loading) {
+  if (isInitialLoading) {
     return (
       <div className="pt-20 min-h-screen bg-theme-page flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-theme-primary border-t-transparent rounded-full animate-spin" />
@@ -59,8 +41,20 @@ const ServiceDetail = () => {
     return (
       <div className="pt-20 min-h-screen bg-theme-page flex items-center justify-center">
         <div className="text-center bg-theme-surface rounded-2xl p-12 shadow-theme-card border border-theme-border max-w-md">
-          <h2 className="text-xl font-bold text-theme-text mb-4">الخدمة غير موجودة</h2>
-          <p className="text-theme-text-secondary mb-6">لم نتمكن من العثور على هذه الخدمة.</p>
+          {notFound && !error ? (
+            <>
+              <h2 className="text-xl font-bold text-theme-text mb-4">الخدمة غير موجودة</h2>
+              <p className="text-theme-text-secondary mb-6">لم نتمكن من العثور على هذه الخدمة.</p>
+            </>
+          ) : (
+            <>
+              <h2 className="text-xl font-bold text-theme-text mb-4">تعذر الاتصال</h2>
+              <p className="text-theme-text-secondary mb-6">لم نتمكن من جلب البيانات. تحقق من اتصالك وحاول مرة أخرى.</p>
+              <button onClick={retry} className="inline-flex items-center gap-2 bg-teal-500 text-white px-6 py-3 rounded-lg font-semibold mb-4">
+                إعادة المحاولة
+              </button>
+            </>
+          )}
           <Link to="/services" className="inline-flex items-center gap-2 bg-teal-500 text-white px-6 py-3 rounded-lg font-semibold">
             <ArrowLeft className="w-5 h-5" />
             العودة للخدمات

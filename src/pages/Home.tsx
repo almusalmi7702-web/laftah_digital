@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Sparkles, MessageCircle, Check, Eye, Target } from 'lucide-react';
 import { useInView } from '../hooks/useInView';
@@ -6,13 +5,13 @@ import {
   hero, values, whyUs, servicesList, packages,
   messages,
 } from '../data/content';
-import { getServices, getPricingPlans, getPortfolioItems } from '../services/dataService';
+import { usePublicServices, usePublicPortfolio, usePublicPricing, usePrefetchOnIdle } from '../hooks/usePublicData';
 import { useSiteSettings } from '../hooks/useSiteSettings';
 import FAQSection from '../components/FAQSection';
 import ImagePlaceholder from '../components/ImagePlaceholder';
 import ServiceImageSlider from '../components/ServiceImageSlider';
 import { CardSkeleton, PricingSkeleton, PortfolioSkeleton } from '../components/Skeleton';
-import type { Service, PricingPlan, PortfolioItem } from '../types/database';
+import type { Service, PricingPlan } from '../types/database';
 
 // ── Hero ──────────────────────────────────────────────────────────────────────
 const Hero = () => {
@@ -164,37 +163,10 @@ const WhyUsPreview = () => {
 // ── Services Preview ──────────────────────────────────────────────────────────
 const ServicesPreview = () => {
   const { ref, isInView } = useInView();
-  const [services, setServices] = useState<Service[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: services, isInitialLoading } = usePublicServices();
 
-  useEffect(() => {
-    let mounted = true;
-
-    const fetchData = async () => {
-      try {
-        const data = await getServices();
-
-        if (mounted) {
-          setServices(data);
-        }
-      } catch (err) {
-        console.error('Error fetching services:', err);
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchData();
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  const preview = services.length > 0 ? services.slice(0, 4) : servicesList.slice(0, 4);
-  const useSupabase = services.length > 0;
+  const preview = services && services.length > 0 ? services.slice(0, 4) : servicesList.slice(0, 4);
+  const useSupabase = !!(services && services.length > 0);
 
   return (
     <section className="py-20 bg-theme-muted">
@@ -205,7 +177,7 @@ const ServicesPreview = () => {
           </h2>
         </div>
 
-        {loading ? (
+        {isInitialLoading ? (
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
             {[0, 1, 2, 3].map((i) => (
               <CardSkeleton key={i} />
@@ -260,36 +232,9 @@ const ServicesPreview = () => {
 // ── Portfolio Preview ─────────────────────────────────────────────────────────
 const PortfolioPreview = () => {
   const { ref, isInView } = useInView();
-  const [items, setItems] = useState<PortfolioItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: items, isInitialLoading } = usePublicPortfolio();
 
-  useEffect(() => {
-    let mounted = true;
-
-    const fetchData = async () => {
-      try {
-        const data = await getPortfolioItems();
-
-        if (mounted) {
-          setItems(data);
-        }
-      } catch (err) {
-        console.error('Error fetching portfolio:', err);
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchData();
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  if (!loading && items.length === 0) {
+  if (!isInitialLoading && items && items.length === 0) {
     return null;
   }
 
@@ -302,7 +247,7 @@ const PortfolioPreview = () => {
           </h2>
         </div>
 
-        {loading ? (
+        {isInitialLoading ? (
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[0, 1, 2, 3].map((i) => (
               <PortfolioSkeleton key={i} />
@@ -311,7 +256,7 @@ const PortfolioPreview = () => {
         ) : (
           <>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-              {items.slice(0, 4).map((item, i) => (
+              {items!.slice(0, 4).map((item, i) => (
                 <Link
                   key={item.id}
                   to={`/portfolio/${item.slug}`}
@@ -358,37 +303,10 @@ const PortfolioPreview = () => {
 const PackagesPreview = () => {
   const { siteSettings, getWhatsAppLink } = useSiteSettings();
   const { ref, isInView } = useInView();
-  const [plans, setPlans] = useState<PricingPlan[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: plans, isInitialLoading } = usePublicPricing();
 
-  useEffect(() => {
-    let mounted = true;
-
-    const fetchData = async () => {
-      try {
-        const data = await getPricingPlans();
-
-        if (mounted) {
-          setPlans(data);
-        }
-      } catch (err) {
-        console.error('Error fetching pricing plans:', err);
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchData();
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  const useSupabase = plans.length > 0;
-  const preview = useSupabase ? plans.slice(0, 3) : packages;
+  const useSupabase = !!(plans && plans.length > 0);
+  const preview = useSupabase ? plans!.slice(0, 3) : packages;
 
   return (
     <section className="py-20 bg-theme-page">
@@ -402,7 +320,7 @@ const PackagesPreview = () => {
           </p>
         </div>
 
-        {loading ? (
+        {isInitialLoading ? (
           <div className="grid md:grid-cols-3 gap-8 items-start">
             {[0, 1, 2].map((i) => (
               <PricingSkeleton key={i} />
@@ -547,17 +465,21 @@ const FinalCTA = () => {
 };
 
 // ── Page ──────────────────────────────────────────────────────────────────────
-const Home = () => (
-  <>
-    <Hero />
-    <ValueStrip />
-    <WhyUsPreview />
-    <ServicesPreview />
-    <PortfolioPreview />
-    <PackagesPreview />
-    <FAQSection />
-    <FinalCTA />
-  </>
-);
+const Home = () => {
+  usePrefetchOnIdle(['portfolio', 'pricing', 'faqs']);
+
+  return (
+    <>
+      <Hero />
+      <ValueStrip />
+      <WhyUsPreview />
+      <ServicesPreview />
+      <PortfolioPreview />
+      <PackagesPreview />
+      <FAQSection />
+      <FinalCTA />
+    </>
+  );
+};
 
 export default Home;

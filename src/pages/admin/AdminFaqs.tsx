@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Pencil as Edit, Trash2, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { getAllFaqs, deleteFaq, updateFaq, createFaq } from '../../services/dataService';
+import { invalidateFaqs } from '../../lib/cacheInvalidation';
 import { useToast } from '../../hooks/useToast';
 import type { Faq } from '../../types/database';
 
@@ -33,6 +34,7 @@ const AdminFaqs = () => {
     try {
       await deleteFaq(deleteId);
       setItems(items.filter(i => i.id !== deleteId));
+      invalidateFaqs();
       showToast('success', 'تم الحذف بنجاح');
     } catch (error: any) {
       showToast('error', error.message || 'حدث خطأ أثناء الحذف');
@@ -45,6 +47,7 @@ const AdminFaqs = () => {
     try {
       await updateFaq(item.id, { is_published: !item.is_published });
       setItems(items.map(i => i.id === item.id ? { ...i, is_published: !i.is_published } : i));
+      invalidateFaqs();
       showToast('success', item.is_published ? 'تم إخفاء السؤال' : 'تم نشر السؤال');
     } catch (error: any) {
       showToast('error', error.message || 'حدث خطأ');
@@ -80,6 +83,7 @@ const AdminFaqs = () => {
         setItems([...items, newItem]);
         showToast('success', 'تم الحفظ بنجاح');
       }
+      invalidateFaqs();
       setShowForm(false);
     } catch (error: any) {
       setError(error.message || 'حدث خطأ أثناء الحفظ');

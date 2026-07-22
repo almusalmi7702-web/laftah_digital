@@ -4,6 +4,7 @@ import { Plus, Pencil as Edit, Trash2, Eye, EyeOff } from 'lucide-react';
 import {
   getAllPortfolioItems, deletePortfolioItem, updatePortfolioItem
 } from '../../services/dataService';
+import { invalidatePortfolio } from '../../lib/cacheInvalidation';
 import { useToast } from '../../hooks/useToast';
 import ImagePlaceholder from '../../components/ImagePlaceholder';
 import type { PortfolioItem } from '../../types/database';
@@ -32,6 +33,7 @@ const AdminPortfolio = () => {
     try {
       await deletePortfolioItem(deleteId);
       setItems(items.filter(item => item.id !== deleteId));
+      invalidatePortfolio();
       showToast('success', 'تم الحذف بنجاح');
     } catch (error: any) {
       showToast('error', error.message || 'حدث خطأ أثناء الحذف');
@@ -44,6 +46,7 @@ const AdminPortfolio = () => {
     try {
       await updatePortfolioItem(item.id, { is_published: !item.is_published });
       setItems(items.map(i => i.id === item.id ? { ...i, is_published: !i.is_published } : i));
+      invalidatePortfolio();
       showToast('success', item.is_published ? 'تم إخفاء العمل' : 'تم نشر العمل');
     } catch (error: any) {
       showToast('error', error.message || 'حدث خطأ');

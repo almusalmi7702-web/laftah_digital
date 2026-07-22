@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Trash2, Eye, EyeOff, Star, Pencil as Edit } from 'lucide-react';
 import { getAllPricingPlans, deletePricingPlan, updatePricingPlan } from '../../services/dataService';
+import { invalidatePricing } from '../../lib/cacheInvalidation';
 import { useToast } from '../../hooks/useToast';
 import type { PricingPlan } from '../../types/database';
 
@@ -29,6 +30,7 @@ const AdminPricing = () => {
     try {
       await deletePricingPlan(deleteId);
       setItems(items.filter(i => i.id !== deleteId));
+      invalidatePricing();
       showToast('success', 'تم الحذف بنجاح');
     } catch (error: any) {
       showToast('error', error.message || 'حدث خطأ أثناء الحذف');
@@ -41,6 +43,7 @@ const AdminPricing = () => {
     try {
       await updatePricingPlan(item.id, { is_published: !item.is_published });
       setItems(items.map(i => i.id === item.id ? { ...i, is_published: !i.is_published } : i));
+      invalidatePricing();
       showToast('success', item.is_published ? 'تم إخفاء الباقة' : 'تم نشر الباقة');
     } catch (error: any) {
       showToast('error', error.message || 'حدث خطأ');
@@ -51,6 +54,7 @@ const AdminPricing = () => {
     try {
       await updatePricingPlan(item.id, { is_featured: !item.is_featured });
       setItems(items.map(i => i.id === item.id ? { ...i, is_featured: !i.is_featured } : i));
+      invalidatePricing();
       showToast('success', item.is_featured ? 'تم إلغاء التمييز' : 'تم تمييز الباقة');
     } catch (error: any) {
       showToast('error', error.message || 'حدث خطأ');

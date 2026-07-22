@@ -4,6 +4,7 @@ import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import {
   getPortfolioItemById, createPortfolioItem, updatePortfolioItem
 } from '../../services/dataService';
+import { invalidatePortfolio } from '../../lib/cacheInvalidation';
 import { useToast } from '../../hooks/useToast';
 import MultiImageUpload from '../../components/admin/MultiImageUpload';
 import { generateSlug, sanitizeSlug } from '../../utils/slug';
@@ -96,6 +97,7 @@ const AdminPortfolioForm = () => {
         showToast('success', 'تم الحفظ بنجاح');
       }
 
+      invalidatePortfolio();
       navigate('/admin/portfolio', { replace: true });
     } catch (err: any) {
       console.error('Error saving:', err);

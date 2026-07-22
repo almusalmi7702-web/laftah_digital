@@ -1,36 +1,16 @@
-import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, ExternalLink, Calendar, MessageCircle } from 'lucide-react';
-import { getPortfolioItemBySlug } from '../services/dataService';
+import { usePublicPortfolioBySlug } from '../hooks/usePublicData';
 import { messages } from '../data/content';
 import { useSiteSettings } from '../hooks/useSiteSettings';
 import ServiceImageSlider from '../components/ServiceImageSlider';
-import type { PortfolioItem } from '../types/database';
 
 const PortfolioDetail = () => {
   const { slug } = useParams();
   const { siteSettings, getWhatsAppLink } = useSiteSettings();
-  const [item, setItem] = useState<PortfolioItem | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: item, isInitialLoading, notFound, error, retry } = usePublicPortfolioBySlug(slug);
 
-  useEffect(() => {
-    const fetch = async () => {
-      if (!slug) return;
-      try {
-        const data = await getPortfolioItemBySlug(slug);
-        if (data) {
-          setItem(data);
-        }
-      } catch (err) {
-        console.error('Error:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetch();
-  }, [slug]);
-
-  if (loading) {
+  if (isInitialLoading) {
     return (
       <div className="pt-20 min-h-screen bg-theme-page flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-theme-primary border-t-transparent rounded-full animate-spin" />
@@ -42,8 +22,20 @@ const PortfolioDetail = () => {
     return (
       <div className="pt-20 min-h-screen bg-theme-page flex items-center justify-center">
         <div className="text-center bg-theme-surface rounded-2xl p-12 shadow-theme-card border border-theme-border max-w-md">
-          <h2 className="text-xl font-bold text-theme-text mb-4">العمل غير موجود</h2>
-          <p className="text-theme-text-secondary mb-6">لم نتمكن من العثور على هذا العمل.</p>
+          {notFound && !error ? (
+            <>
+              <h2 className="text-xl font-bold text-theme-text mb-4">العمل غير موجود</h2>
+              <p className="text-theme-text-secondary mb-6">لم نتمكن من العثور على هذا العمل.</p>
+            </>
+          ) : (
+            <>
+              <h2 className="text-xl font-bold text-theme-text mb-4">تعذر الاتصال</h2>
+              <p className="text-theme-text-secondary mb-6">لم نتمكن من جلب البيانات. تحقق من اتصالك وحاول مرة أخرى.</p>
+              <button onClick={retry} className="inline-flex items-center gap-2 bg-teal-500 text-white px-6 py-3 rounded-lg font-semibold mb-4">
+                إعادة المحاولة
+              </button>
+            </>
+          )}
           <Link to="/portfolio" className="inline-flex items-center gap-2 bg-teal-500 text-white px-6 py-3 rounded-lg font-semibold">
             <ArrowLeft className="w-5 h-5" />
             العودة للأعمال

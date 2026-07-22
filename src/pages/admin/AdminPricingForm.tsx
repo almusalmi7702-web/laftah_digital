@@ -4,6 +4,7 @@ import { ArrowLeft, Save, Loader2, Plus, X, Star } from 'lucide-react';
 import {
   getAllPricingPlans, createPricingPlan, updatePricingPlan
 } from '../../services/dataService';
+import { invalidatePricing } from '../../lib/cacheInvalidation';
 import { useToast } from '../../hooks/useToast';
 import type { PricingPlan, PricingInsert } from '../../types/database';
 
@@ -94,6 +95,7 @@ const AdminPricingForm = () => {
         showToast('success', 'تم الحفظ بنجاح');
       }
 
+      invalidatePricing();
       navigate('/admin/pricing', { replace: true });
     } catch (err: any) {
       console.error('Error saving:', err);
