@@ -5,7 +5,8 @@ import {
   hero, values, whyUs, servicesList, packages,
   messages,
 } from '../data/content';
-import { usePublicServices, usePublicPortfolio, usePublicPricing, usePrefetchOnIdle } from '../hooks/usePublicData';
+import { usePublicHomePayload, usePrefetchOnIdle } from '../hooks/usePublicData';
+import { usePublicServices, usePublicPortfolio, usePublicPricing } from '../hooks/usePublicData';
 import { useSiteSettings } from '../hooks/useSiteSettings';
 import FAQSection from '../components/FAQSection';
 import ImagePlaceholder from '../components/ImagePlaceholder';
@@ -466,6 +467,8 @@ const FinalCTA = () => {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 const Home = () => {
+  // Single API call for all home data — hydrates individual caches for other pages
+  usePublicHomePayload();
   usePrefetchOnIdle(['portfolio', 'pricing', 'faqs']);
 
   return (

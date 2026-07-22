@@ -13,6 +13,7 @@ import {
 import {
   getPublicSiteSettings,
   getPublicSocialLinks,
+  forceRefreshResource,
   onCrossTabUpdate,
 } from '../lib/publicDataClient';
 import type { SiteSettings, SocialLink } from '../types/settings';
@@ -68,17 +69,36 @@ export const SiteSettingsProvider = ({
         setError(null);
       } else if (settingsResult.error) {
         setError(settingsResult.error);
-        // Keep existing settings (fallback or last-known-good)
       }
 
       if (linksResult.data) {
         setSocialLinks(linksResult.data);
       }
-      // On error, keep existing social links (last-known-good)
     } catch (err) {
       console.error('Site settings fetch failed:', err);
       setError(err instanceof Error ? err.message : 'fetch failed');
-      // Keep existing data — don't overwrite with empty
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Force refresh — bypasses cache, used after admin invalidation and cross-tab sync
+  const forceRefreshSettings = useCallback(async () => {
+    try {
+      const [settingsResult, linksResult] = await Promise.all([
+        forceRefreshResource<SiteSettings>('site-settings'),
+        forceRefreshResource<SocialLink[]>('social-links'),
+      ]);
+
+      if (settingsResult.data) {
+        setSiteSettings(settingsResult.data);
+        setError(null);
+      }
+      if (linksResult.data) {
+        setSocialLinks(linksResult.data);
+      }
+    } catch (err) {
+      console.error('Site settings force refresh failed:', err);
     } finally {
       setLoading(false);
     }
@@ -88,15 +108,15 @@ export const SiteSettingsProvider = ({
     refreshSettings();
   }, [refreshSettings]);
 
-  // Cross-tab sync: refresh when another tab updates the cache
+  // Cross-tab sync: force refresh when another tab updates the cache
   useEffect(() => {
     const unsubscribe = onCrossTabUpdate((resource) => {
       if (resource === 'site-settings' || resource === 'social-links' || resource === 'home') {
-        refreshSettings();
+        forceRefreshSettings();
       }
     });
     return unsubscribe;
-  }, [refreshSettings]);
+  }, [forceRefreshSettings]);
 
   const getCleanWhatsAppNumber = useCallback(
     () => cleanWhatsAppNumber(siteSettings.whatsapp_number),

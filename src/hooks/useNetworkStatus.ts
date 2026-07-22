@@ -1,25 +1,29 @@
 /**
  * Network status hook — tracks online/offline state.
- * Used as a signal for background refresh, not as definitive proof of API reachability.
+ *
+ * connectionRestored is a transient signal that fires once when the network
+ * transitions from offline → online. It must be consumed (consumeConnectionRestored)
+ * to reset, so it doesn't stay true forever.
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 export interface NetworkStatus {
   isOnline: boolean;
-  wasOffline: boolean;
+  connectionRestored: boolean;
+  consumeConnectionRestored: () => void;
 }
 
 export function useNetworkStatus(): NetworkStatus {
   const [isOnline, setIsOnline] = useState(() =>
     typeof navigator !== 'undefined' ? navigator.onLine : true
   );
-  const [wasOffline, setWasOffline] = useState(false);
+  const [connectionRestored, setConnectionRestored] = useState(false);
 
   useEffect(() => {
     const handleOnline = () => {
       setIsOnline(true);
-      setWasOffline(true);
+      setConnectionRestored(true);
     };
 
     const handleOffline = () => {
@@ -35,5 +39,9 @@ export function useNetworkStatus(): NetworkStatus {
     };
   }, []);
 
-  return { isOnline, wasOffline };
+  const consumeConnectionRestored = useCallback(() => {
+    setConnectionRestored(false);
+  }, []);
+
+  return { isOnline, connectionRestored, consumeConnectionRestored };
 }

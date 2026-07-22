@@ -176,15 +176,48 @@ async function fetchResource(
         supabase.from('social_links').select('*').order('sort_order', { ascending: true }),
       ]);
 
+      // Check each result for errors — don't return empty arrays for failed sections
+      const homeData: Record<string, unknown> = {};
+      const errors: string[] = [];
+
+      if (services.status === 'fulfilled') {
+        if (services.value.error) errors.push('services');
+        else homeData.services = services.value.data || [];
+      } else errors.push('services');
+
+      if (portfolio.status === 'fulfilled') {
+        if (portfolio.value.error) errors.push('portfolio');
+        else homeData.portfolio = portfolio.value.data || [];
+      } else errors.push('portfolio');
+
+      if (pricing.status === 'fulfilled') {
+        if (pricing.value.error) errors.push('pricing');
+        else homeData.pricing = pricing.value.data || [];
+      } else errors.push('pricing');
+
+      if (faqs.status === 'fulfilled') {
+        if (faqs.value.error) errors.push('faqs');
+        else homeData.faqs = faqs.value.data || [];
+      } else errors.push('faqs');
+
+      if (settings.status === 'fulfilled') {
+        if (settings.value.error) errors.push('siteSettings');
+        else homeData.siteSettings = settings.value.data || null;
+      } else errors.push('siteSettings');
+
+      if (social.status === 'fulfilled') {
+        if (social.value.error) errors.push('socialLinks');
+        else homeData.socialLinks = social.value.data || [];
+      } else errors.push('socialLinks');
+
+      // If all sections failed, return upstream error
+      if (errors.length === 6) {
+        return { data: null, notFound: false, status: 502 };
+      }
+
+      // Return partial payload with error info for failed sections
       return {
-        data: {
-          services: services.status === 'fulfilled' ? (services.value.data || []) : [],
-          portfolio: portfolio.status === 'fulfilled' ? (portfolio.value.data || []) : [],
-          pricing: pricing.status === 'fulfilled' ? (pricing.value.data || []) : [],
-          faqs: faqs.status === 'fulfilled' ? (faqs.value.data || []) : [],
-          siteSettings: settings.status === 'fulfilled' ? settings.value.data : null,
-          socialLinks: social.status === 'fulfilled' ? (social.value.data || []) : [],
-        },
+        data: { ...homeData, _errors: errors },
         notFound: false,
         status: 200,
       };

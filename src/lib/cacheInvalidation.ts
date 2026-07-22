@@ -1,6 +1,9 @@
 /**
  * Cache invalidation helpers for admin operations.
  * Called after successful create/update/delete to refresh the public cache.
+ *
+ * invalidateResource now marks cache as stale (invalidatedAt) instead of deleting,
+ * preserving last-known-good data while forcing a background refresh.
  */
 
 import { invalidateResource, invalidateAll } from './publicDataClient';
